@@ -3,38 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dual-Scanner — Safety + Cost (FINAL)</title>
-
-  <meta name="description" content="Dual-Scanner: Safety (EmotionGate) + Cost (AnchorGateway). Reason codes, report JSON, policy export." />
-  <meta property="og:title" content="Dual-Scanner — Safety + Cost" />
-  <meta property="og:description" content="Analyze text for safety + cost. Enforce preview with reason codes and exportable JSON." />
-  <meta name="robots" content="index,follow" />
+  <title>Dual-Scanner — EmotionGate × AnchorGateway</title>
+  <meta name="description" content="AI Safety Sandbox: check prompt safety (EmotionGate) and estimate cost (AnchorGateway) before you run it." />
+  <meta property="og:title" content="Dual-Scanner — Safety + Cost preflight" />
+  <meta property="og:description" content="Paste a prompt or LLM output. Get ALLOW/BLOCK and reason codes in seconds." />
   <link rel="icon" type="image/png" href="Logo.png" />
 
   <style>
     :root{
-      --bg0:#060813;
-      --bg1:#0a0f22;
+      --bg0:#060813; --bg1:#0a0f22;
       --glassA: rgba(255,255,255,.06);
       --glassB: rgba(255,255,255,.03);
       --border: rgba(255,255,255,.10);
-      --text: #eef2ff;
-      --muted: rgba(238,242,255,.70);
+      --text: #eef2ff; --muted: rgba(238,242,255,.70);
 
-      --c1:#16d3ff;
-      --c2:#3a7bff;
-      --c3:#8b5cff;
-
-      --good:#2de38c;
-      --warn:#ffcc4d;
-      --bad:#ff4d4d;
+      --c1:#16d3ff; --c2:#3a7bff; --c3:#8b5cff;
+      --good:#2de38c; --warn:#ffcc4d; --bad:#ff4d4d;
 
       --shadow: 0 16px 55px rgba(0,0,0,.48);
       --shadowSoft: 0 10px 30px rgba(0,0,0,.30);
       --radius: 20px;
 
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
     *{box-sizing:border-box}
@@ -50,7 +41,10 @@
         linear-gradient(180deg, var(--bg0), var(--bg1) 70%);
     }
 
-    .wrap{max-width: 1100px; margin:0 auto; padding: 22px 16px 70px;}
+    a{color:inherit; text-decoration:none}
+    a:hover{opacity:.92}
+
+    .container{max-width:1100px; margin:0 auto; padding: 0 16px;}
     .card{
       border:1px solid var(--border);
       background: linear-gradient(180deg, var(--glassA), var(--glassB));
@@ -73,20 +67,20 @@
       border-radius: var(--radius);
     }
 
-    /* Top */
-    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px;}
-    .brand{display:flex; align-items:center; gap:12px; min-width: 240px;}
+    /* Header */
+    .site-header{padding: 18px 0 10px;}
+    .header-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+    .brand{display:flex; align-items:center; gap:12px;}
     .logo{
-      width: 40px; height: 40px; border-radius: 14px;
+      width:42px; height:42px; border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,.03);
       object-fit: contain;
       box-shadow: 0 14px 40px rgba(22,211,255,.12);
     }
-    .brandText{display:flex; flex-direction:column; line-height:1.15;}
-    .brandText .name{font-weight: 950; letter-spacing: .2px; font-size: 13px;}
-    .brandText .sub{color: var(--muted); font-size: 12px; margin-top: 3px;}
-    .metaRight{color: var(--muted); font-size: 12px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+    .brandText{display:flex; flex-direction:column; line-height:1.1;}
+    .brandText .name{font-weight:950; font-size:13px; letter-spacing:.2px;}
+    .brandText .sub{color: var(--muted); font-size:12px; margin-top:3px;}
     .pill{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
@@ -94,54 +88,22 @@
       border-radius: 999px;
       box-shadow: var(--shadowSoft);
       white-space: nowrap;
-    }
-
-    /* Header */
-    .header{margin-bottom: 12px;}
-    h1{margin:0; font-size: 28px; letter-spacing:-0.5px; line-height:1.05;}
-    .desc{margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; max-width: 85ch;}
-
-    /* Layout */
-    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap: 12px; align-items:start;}
-
-    /* Controls */
-    .controls{display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;}
-    .ctrl{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: 16px;
-      padding:10px 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .lbl{display:flex; justify-content:space-between; gap:10px; align-items:center; color: var(--muted); font-size: 12px; margin-bottom: 8px;}
-    select, input[type="number"]{
-      width:100%;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      padding:10px 10px;
-      outline:none;
-      font-weight: 850;
-    }
-    select:focus, input[type="number"]:focus{
-      border-color: rgba(22,211,255,.32);
-      box-shadow: 0 0 0 4px rgba(22,211,255,.08);
-    }
-    input[type="range"]{width:100%; accent-color: var(--c2);}
-    .val{
-      font-family: var(--mono);
+      color: var(--muted);
       font-size: 12px;
-      color: rgba(238,242,255,.90);
-      min-width: 90px;
-      text-align:right;
     }
-    .hint{margin-top:8px; font-size:11px; color: rgba(238,242,255,.58); line-height:1.45;}
 
-    /* Text input */
+    /* Hero */
+    .hero{margin: 8px 0 12px;}
+    .hero h1{margin:0; font-size: 30px; letter-spacing:-0.6px; line-height:1.05;}
+    .hero p{margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height:1.55; max-width: 85ch;}
+    .heroRow{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+
+    /* Input */
+    .scanner-input-section{margin: 12px 0;}
+    .input-wrapper{display:grid; gap: 10px;}
     textarea{
       width:100%;
-      min-height: 240px;
+      min-height: 220px;
       resize: vertical;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
@@ -158,11 +120,8 @@
       border-color: rgba(22,211,255,.32);
       box-shadow: 0 0 0 4px rgba(22,211,255,.08);
     }
-    .row{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color: var(--muted); font-size: 12px; margin-top:10px;}
-    .mono{font-family: var(--mono);}
 
-    /* Buttons */
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px;}
+    .actions{display:flex; gap:10px; flex-wrap:wrap;}
     .btn{
       appearance:none;
       border:1px solid rgba(255,255,255,.14);
@@ -181,36 +140,78 @@
     }
     .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.20)}
     .btn:active{transform: translateY(1px)}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
     .btn.primary{
       border-color: rgba(58,123,255,.35);
       background: linear-gradient(135deg, rgba(22,211,255,.22), rgba(139,92,255,.20));
     }
-    .btnIcon{width:16px;height:16px;opacity:.95;}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+
+    .metaRow{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color: var(--muted); font-size: 12px;}
+    .mono{font-family: var(--mono);}
 
     /* Results */
-    .sectionTitle{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
-    .sectionTitle h2{margin:0; font-size: 13px; letter-spacing:.2px;}
-    .small{color: var(--muted); font-size: 12px;}
+    .results-section{margin-top: 12px;}
+    .grid-layout{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items:start;
+    }
 
+    .card-header{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom: 10px;}
+    .card-header h2{margin:0; font-size: 14px; letter-spacing:.2px;}
+    .badge{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: var(--shadowSoft);
+      white-space: nowrap;
+    }
+
+    .metric-item{display:flex; justify-content:space-between; gap:10px; align-items:baseline; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.08);}
+    .metric-item:first-child{border-top:none}
+    .label{color: var(--muted); font-size: 12px;}
+    .value{font-weight: 950; font-size: 14px;}
+    .good{color: var(--good)}
+    .warn{color: var(--warn)}
+    .bad{color: var(--bad)}
+
+    .reasonBox{
+      margin-top: 10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .reasonHead{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom: 8px;}
+    .reasonHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
+    .reasonHead .n{font-size:12px; color: var(--muted);}
+    ul{margin:0; padding-left: 18px;}
+    li{color: var(--muted); font-size: 12px; line-height: 1.55; margin: 4px 0;}
+    .code{font-family: var(--mono); color: rgba(238,242,255,.88);}
+
+    .card-footer{margin-top: 12px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 10px;}
+    .card-footer p{margin:0 0 8px; color: var(--muted); font-size: 12px; line-height: 1.5;}
+    .text-link{color: rgba(122,162,255,1); font-weight: 950; font-size: 12px;}
+
+    /* Verdict */
     .verdict{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-flex; align-items:center; gap:8px;
       border-radius: 999px;
       padding: 7px 10px;
       border:1px solid rgba(255,255,255,.12);
-      font-size: 12px;
-      font-weight: 950;
-      letter-spacing: .2px;
+      font-size: 12px; font-weight: 950;
       box-shadow: var(--shadowSoft);
       background: rgba(0,0,0,.14);
       white-space: nowrap;
     }
     .dot{width:9px;height:9px;border-radius:99px}
-    .allow .dot{background: rgba(45,227,140,.95); box-shadow: 0 0 18px rgba(45,227,140,.18);}
-    .warnV .dot{background: rgba(255,204,77,.95); box-shadow: 0 0 18px rgba(255,204,77,.18);}
-    .block .dot{background: rgba(255,77,77,.95); box-shadow: 0 0 18px rgba(255,77,77,.18);}
+    .ALLOW .dot{background: rgba(45,227,140,.95); box-shadow: 0 0 18px rgba(45,227,140,.18);}
+    .BLOCK .dot{background: rgba(255,77,77,.95); box-shadow: 0 0 18px rgba(255,77,77,.18);}
 
     .bar{
       height: 12px;
@@ -219,6 +220,7 @@
       background: rgba(255,255,255,.03);
       overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+      margin-top: 10px;
     }
     .fill{
       height:100%;
@@ -228,431 +230,188 @@
       box-shadow: 0 0 18px rgba(45,227,140,.14);
     }
 
-    .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top: 10px;}
-    .kpi{
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding: 10px 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .kpi .k{color: var(--muted); font-size: 12px;}
-    .kpi .v{margin-top:4px; font-size: 16px; font-weight: 950; letter-spacing: -0.2px;}
-
-    /* Reasons */
-    .reasons{
-      margin-top: 10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: 16px;
-      padding: 10px 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .reasonsHead{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;}
-    .reasonsHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
-    ul{margin:0; padding-left: 18px;}
-    li{color: var(--muted); font-size: 12px; line-height: 1.55; margin: 4px 0;}
-    .code{font-family: var(--mono); color: rgba(238,242,255,.88);}
-
-    /* PII preview */
-    .preview{
-      margin-top: 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .previewHead{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
-    .previewHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
-    .previewBody{
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.6;
-      color: rgba(238,242,255,.84);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    mark{
-      background: rgba(255,204,77,.18);
-      border:1px solid rgba(255,204,77,.32);
-      color: rgba(238,242,255,.95);
-      padding: 0 3px;
-      border-radius: 8px;
-    }
-
-    /* Exports */
-    .exports{margin-top: 12px; display:grid; gap:10px;}
-    .codeWrap{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .codeHead{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
-    .codeHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
-    pre{
-      margin:0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.6;
-      color: rgba(238,242,255,.86);
-    }
-
-    /* Toast */
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.62);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 999px;
-      padding: 10px 12px;
-      color: rgba(238,242,255,.90);
-      font-size: 12px;
-      font-weight: 950;
-      letter-spacing: .1px;
-      display:none;
-      align-items:center;
-      gap:10px;
-      box-shadow: var(--shadow);
-      z-index: 9999;
-    }
-    .toast .tDot{
-      width:10px;height:10px;border-radius:99px;
-      background: linear-gradient(135deg, var(--c1), var(--c3));
-      box-shadow: 0 0 22px rgba(22,211,255,.18);
-    }
-
-    /* Scan animation (minimal) */
-    .scanning .fill{animation: pulse 1.05s ease-in-out infinite;}
-    .scanning .btn.primary{animation: btnPulse 1.05s ease-in-out infinite;}
-    @keyframes pulse{0%{opacity:.70}50%{opacity:1}100%{opacity:.70}}
-    @keyframes btnPulse{
-      0%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
-      50%{box-shadow: var(--shadowSoft), 0 0 26px rgba(22,211,255,.18)}
-      100%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
-    }
-
-    .footer{margin-top: 14px; text-align:center; color: var(--muted); font-size: 12px;}
+    /* Footer */
+    footer{margin-top: 14px; padding: 14px 0 40px; color: var(--muted); font-size: 12px; text-align:center;}
 
     @media (max-width: 920px){
-      .grid{grid-template-columns: 1fr;}
-      .controls{grid-template-columns: 1fr;}
-      h1{font-size:26px}
-      .metaRight{justify-content:flex-start}
+      .grid-layout{grid-template-columns: 1fr;}
+      .hero h1{font-size: 26px;}
+      .metaRow{justify-content:flex-start}
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
+  <!-- Put Logo.png next to this file -->
+  <header class="site-header">
+    <div class="container header-row">
       <div class="brand">
-        <img class="logo" src="Logo.png" alt="Logo" onerror="this.style.display='none';" />
+        <img src="Logo.png" alt="Dual-Scanner Logo" class="logo" onerror="this.style.display='none';" />
         <div class="brandText">
           <div class="name">Dual-Scanner</div>
           <div class="sub">Safety (EmotionGate) + Cost (AnchorGateway)</div>
         </div>
       </div>
-      <div class="metaRight">
-        <span class="pill" id="pricingUpdated">Pricing: local</span>
-        <span class="pill" id="buildStamp">FINAL</span>
-      </div>
+      <div class="pill" id="pricingStamp">Pricing: local placeholder</div>
     </div>
+  </header>
 
-    <div class="card header">
-      <h1>Safety + Cost preflight</h1>
-      <p class="desc">
-        Paste a prompt or an LLM response. This page returns: <b>ALLOW/BLOCK</b>, reason codes, and exportable JSON for audit/policy config.
+  <main class="container">
+    <section class="hero card">
+      <h1>AI Safety Sandbox</h1>
+      <p>
+        Paste a prompt or LLM output. Get a fast <b>ALLOW / BLOCK</b> preflight with reason codes.
+        This is a lightweight demo — swap heuristics with real models later.
       </p>
-    </div>
 
-    <section class="grid">
-      <!-- LEFT: INPUT -->
-      <div class="card">
-        <div class="sectionTitle">
-          <h2>Input & Controls</h2>
-          <span class="small mono" id="stamp">—</span>
-        </div>
+      <div class="heroRow">
+        <span class="verdict" id="overallVerdict"><span class="dot"></span><span>—</span></span>
+        <span class="pill">No login</span>
+        <span class="pill">Demo heuristics</span>
+        <span class="pill mono" id="caps">cap $0.010 • safety ≥ 60</span>
+      </div>
 
-        <div class="controls">
-          <div class="ctrl">
-            <div class="lbl"><span>Model</span><span class="val" id="modelHint">—</span></div>
-            <select id="modelSelect"></select>
-            <div class="hint">“Custom” lets you edit $/1k tokens.</div>
-          </div>
+      <div class="bar"><div class="fill" id="overallFill"></div></div>
+    </section>
 
-          <div class="ctrl">
-            <div class="lbl"><span>Max cost cap (USD)</span><span class="val" id="capUsdVal">$0.010</span></div>
-            <input id="capUsd" type="range" min="0" max="50" value="10" />
-            <div class="hint">Range: $0.000–$0.050 per request.</div>
-          </div>
+    <section class="scanner-input-section card">
+      <div class="input-wrapper">
+        <textarea id="promptInput" placeholder="Paste a prompt or LLM output here..."></textarea>
 
-          <div class="ctrl">
-            <div class="lbl"><span>Output tokens (estimate)</span><span class="val" id="outTokVal">256</span></div>
-            <input id="outTok" type="range" min="0" max="4096" value="256" step="16" />
-            <div class="hint">Cost includes both input + output tokens.</div>
-          </div>
-
-          <div class="ctrl">
-            <div class="lbl"><span>Safety threshold</span><span class="val" id="thrVal">60</span></div>
-            <input id="thr" type="range" min="0" max="100" value="60" />
-            <div class="hint">BLOCK if Safety Score is below threshold.</div>
-          </div>
-
-          <div class="ctrl" id="customPricingCtrl" style="display:none; grid-column: 1 / -1;">
-            <div class="lbl"><span>Custom pricing ($ / 1k)</span><span class="small">input + output</span></div>
-            <div class="controls" style="margin:0; grid-template-columns: 1fr 1fr;">
-              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
-                <div class="lbl"><span>Input $/1k</span><span class="val" id="inPriceShow">0.0030</span></div>
-                <input id="inPrice" type="number" min="0" step="0.0001" value="0.0030" />
-              </div>
-              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
-                <div class="lbl"><span>Output $/1k</span><span class="val" id="outPriceShow">0.0060</span></div>
-                <input id="outPrice" type="number" min="0" step="0.0001" value="0.0060" />
-              </div>
-            </div>
-            <div class="hint">Replace local placeholder pricing later.</div>
-          </div>
-        </div>
-
-        <textarea id="text" placeholder="Paste text here..."></textarea>
-
-        <div class="row">
-          <span id="chars">0 chars</span>
-          <span id="words">0 words</span>
-          <span class="mono" id="inTok">Input tokens: —</span>
+        <div class="metaRow">
+          <span id="charCount">0 chars</span>
+          <span id="wordCount">0 words</span>
+          <span class="mono" id="tokenEstimate">Input tokens: —</span>
         </div>
 
         <div class="actions">
-          <button class="btn primary" id="analyzeBtn">
-            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
-              <path d="M4 7V5a2 2 0 012-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M20 7V5a2 2 0 00-2-2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M4 17v2a2 2 0 002 2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M20 17v2a2 2 0 01-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-            </svg>
-            <span id="analyzeText">Analyze</span>
-          </button>
-
-          <button class="btn" id="exampleBtn">
-            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
-              <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/>
-              <path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-            </svg>
-            Example
-          </button>
-
-          <button class="btn" id="clearBtn">
-            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
-              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 6l1-2h6l1 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 10v8M12 10v8M16 10v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-            </svg>
-            Clear
-          </button>
+          <button id="analyzeBtn" class="btn primary">Analyze</button>
+          <button id="exampleBtn" class="btn">Example</button>
+          <button id="clearBtn" class="btn">Clear</button>
         </div>
-
-        <div class="preview">
-          <div class="previewHead">
-            <div class="t">PII Highlight Preview</div>
-            <div class="small">email • phone • IP</div>
-          </div>
-          <div id="piiPreview" class="previewBody">—</div>
-        </div>
-      </div>
-
-      <!-- RIGHT: RESULTS + EXPORT -->
-      <div class="card" id="scanRoot">
-        <div class="sectionTitle">
-          <h2>Enforce Preview</h2>
-          <span id="overallVerdict" class="verdict warnV"><span class="dot"></span><span>—</span></span>
-        </div>
-
-        <!-- SAFETY -->
-        <div style="margin-bottom:12px;">
-          <div class="sectionTitle" style="margin-bottom:8px;">
-            <span class="small"><b>Safety</b> (EmotionGate)</span>
-            <span class="small">threshold: <span class="mono" id="thrShow">60</span></span>
-          </div>
-          <div class="bar"><div id="safetyFill" class="fill"></div></div>
-          <div class="kpis">
-            <div class="kpi">
-              <div class="k">Safety Score</div>
-              <div class="v" id="safetyScore">—</div>
-            </div>
-            <div class="kpi">
-              <div class="k">PII detected</div>
-              <div class="v" id="piiYesNo">—</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- COST -->
-        <div style="margin-bottom:12px;">
-          <div class="sectionTitle" style="margin-bottom:8px;">
-            <span class="small"><b>Cost</b> (AnchorGateway)</span>
-            <span class="small">cap: <span class="mono" id="capShow">$0.010</span></span>
-          </div>
-          <div class="bar"><div id="costFill" class="fill"></div></div>
-          <div class="kpis">
-            <div class="kpi">
-              <div class="k">Tokens (in / out)</div>
-              <div class="v" id="tokPair">—</div>
-            </div>
-            <div class="kpi">
-              <div class="k">Estimated cost</div>
-              <div class="v" id="costUsd">—</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="reasons">
-          <div class="reasonsHead">
-            <div class="t">Reason codes</div>
-            <div class="small" id="reasonsCount">0</div>
-          </div>
-          <ul id="reasonsList">
-            <li class="small">—</li>
-          </ul>
-        </div>
-
-        <div class="exports">
-          <div class="codeWrap">
-            <div class="codeHead">
-                          <div class="codeHead">
-              <div class="t">Report JSON</div>
-              <button class="btn" id="copyReportBtn">
-                <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 9h10v12H9z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1" stroke="currentColor" stroke-width="2" opacity=".9"/>
-                </svg>
-                Copy
-              </button>
-            </div>
-            <pre id="reportJson">—</pre>
-          </div>
-
-          <div class="codeWrap">
-            <div class="codeHead">
-              <div class="t">Policy JSON</div>
-              <button class="btn" id="copyPolicyBtn">
-                <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 9h10v12H9z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1" stroke="currentColor" stroke-width="2" opacity=".9"/>
-                </svg>
-                Copy
-              </button>
-            </div>
-            <pre id="policyJson">—</pre>
-          </div>
-        </div>
-
-        <div class="footer">© <span id="year"></span> Dual-Scanner</div>
       </div>
     </section>
-  </div>
 
-  <div class="toast" id="toast"><span class="tDot"></span><span id="toastMsg">Copied</span></div>
+    <section class="results-section" id="resultsContainer" style="display:none;">
+      <div class="grid-layout">
+
+        <!-- EmotionGate -->
+        <div class="card">
+          <div class="card-header">
+            <h2>🧠 EmotionGate</h2>
+            <span class="badge">Safety & Tone</span>
+          </div>
+
+          <div class="metric-item">
+            <span class="label">Safety score</span>
+            <span class="value" id="safetyScore">—</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Tone</span>
+            <span class="value" id="toneValue">—</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">PII detected</span>
+            <span class="value" id="piiDetected">—</span>
+          </div>
+
+          <div class="reasonBox">
+            <div class="reasonHead">
+              <div class="t">Reason codes</div>
+              <div class="n" id="egReasonCount">0</div>
+            </div>
+            <ul id="egReasons"><li>—</li></ul>
+          </div>
+
+          <div class="card-footer">
+            <p>Want to block risky prompts automatically?</p>
+            <a href="https://emotiongate.com" target="_blank" rel="noopener" class="text-link">Join EmotionGate waitlist →</a>
+          </div>
+        </div>
+
+        <!-- AnchorGateway -->
+        <div class="card">
+          <div class="card-header">
+            <h2>⚓ AnchorGateway</h2>
+            <span class="badge">Tokens & Cost</span>
+          </div>
+
+          <div class="metric-item">
+            <span class="label">Estimated tokens</span>
+            <span class="value" id="tokenCount">—</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Estimated cost (demo)</span>
+            <span class="value" id="costEstimate">—</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Cap status</span>
+            <span class="value" id="capStatus">—</span>
+          </div>
+
+          <div class="reasonBox">
+            <div class="reasonHead">
+              <div class="t">Reason codes</div>
+              <div class="n" id="agReasonCount">0</div>
+            </div>
+            <ul id="agReasons"><li>—</li></ul>
+          </div>
+
+          <div class="card-footer">
+            <p>Want hard spending caps with enforce + audit?</p>
+            <a href="https://anchorgateway.com" target="_blank" rel="noopener" class="text-link">Join AnchorGateway waitlist →</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> EmotionGate × AnchorGateway — Building secure AI infrastructure.
+    </div>
+  </footer>
 
   <script>
     const $ = (id) => document.getElementById(id);
     const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
 
-    // --- Local placeholder pricing (swap later without UI changes)
+    // Demo pricing (local placeholder)
     const PRICING_LAST_UPDATED = "2026-01-03 (local placeholder)";
-    const MODELS = [
-      { id:"demo-mini", name:"Demo Mini", inPer1k:0.0010, outPer1k:0.0020 },
-      { id:"demo-standard", name:"Demo Standard", inPer1k:0.0030, outPer1k:0.0060 },
-      { id:"demo-pro", name:"Demo Pro", inPer1k:0.0100, outPer1k:0.0300 },
-      { id:"custom", name:"Custom", inPer1k:0.0030, outPer1k:0.0060 }
-    ];
+    // Replace later (or fetch from a JSON endpoint).
+    const DEMO_MODEL = { name: "Demo Standard", inPer1k: 0.0030, outPer1k: 0.0060 };
+    const DEFAULT_OUTPUT_TOKENS = 256; // demo assumption
+    const COST_CAP_USD = 0.010;        // demo cap
+    const SAFETY_THRESHOLD = 60;       // demo threshold
 
-    // Rough token estimator for UI wedge
-    const estimateTokens = (text) => Math.max(0, Math.round((text.trim().length)/4));
+    // Rough token estimator for wedge demo
+    const estimateTokens = (text) => Math.max(0, Math.round(text.trim().length / 4));
     const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0);
 
     const dollars = (n) => {
       const s = n.toFixed(6);
       return "$" + s.replace(/0+$/,"").replace(/\.$/,"");
     };
-    const nowISO = () => new Date().toISOString();
 
-    function toast(msg){
-      $("toastMsg").textContent = msg;
-      $("toast").style.display = "flex";
-      clearTimeout(toast._t);
-      toast._t = setTimeout(()=> $("toast").style.display="none", 1400);
+    function estimateCostUSD(inTok, outTok){
+      return (inTok/1000)*DEMO_MODEL.inPer1k + (outTok/1000)*DEMO_MODEL.outPer1k;
     }
 
-    async function copyText(text){
-      try{
-        await navigator.clipboard.writeText(text);
-        toast("Copied ✓");
-      } catch(e){
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        toast("Copied ✓");
-      }
-    }
-
-    function getSelectedModel(){
-      const id = $("modelSelect").value;
-      const base = MODELS.find(m => m.id === id) || MODELS[0];
-      if(id !== "custom") return base;
-      const inP = Math.max(0, parseFloat($("inPrice").value || "0"));
-      const outP = Math.max(0, parseFloat($("outPrice").value || "0"));
-      return { id:"custom", name:"Custom", inPer1k: inP, outPer1k: outP };
-    }
-
-    function estimateCostUSD(inTok, outTok, model){
-      return (inTok/1000)*model.inPer1k + (outTok/1000)*model.outPer1k;
-    }
-
-    // --- PII detection + highlight
+    // PII detection (simple)
     const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
     const RE_PHONE = /(\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4}/g;
     const RE_IP = /\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b/g;
 
     function detectPII(text){
       const f = [];
-      if(RE_EMAIL.test(text)) f.push({ code:"EG_PII_EMAIL", detail:"Email address detected" });
-      if(RE_PHONE.test(text)) f.push({ code:"EG_PII_PHONE", detail:"Phone-like number detected" });
-      if(RE_IP.test(text)) f.push({ code:"EG_PII_IP", detail:"IP address detected" });
+      if (RE_EMAIL.test(text)) f.push({ code:"EG_PII_EMAIL", detail:"Email address detected" });
+      if (RE_PHONE.test(text)) f.push({ code:"EG_PII_PHONE", detail:"Phone-like number detected" });
+      if (RE_IP.test(text)) f.push({ code:"EG_PII_IP", detail:"IP address detected" });
       return f;
     }
 
-    function escapeHtml(s){
-      return s.replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
-    }
-
-    function highlightPII(text){
-      if(!text.trim()) return "—";
-      let safe = escapeHtml(text);
-      const patterns = [
-        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
-        /((\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4})/g,
-        /(\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b)/g
-      ];
-      for(const re of patterns) safe = safe.replace(re, "<mark>$1</mark>");
-      return safe;
-    }
-
-    // --- Safety heuristic (placeholder)
+    // Safety heuristic (placeholder)
     function heuristicToxicity(text){
       const lower = text.toLowerCase();
       const badWords = ["kill","hate","idiot","stupid","moron","shut up","die","nazi","rape","kys","suicide","bomb","dox","address"];
@@ -665,282 +424,132 @@
       return clamp(score, 0, 100);
     }
 
-    // --- Bars + verdict UI
-    function setBar(fillEl, value0to100){
-      fillEl.style.width = value0to100 + "%";
-      let colorA = "rgba(45,227,140,.85)";
-      let colorB = "rgba(45,227,140,.55)";
-      if(value0to100 < 35){ colorA="rgba(255,77,77,.85)"; colorB="rgba(255,77,77,.55)"; }
-      else if(value0to100 < 65){ colorA="rgba(255,204,77,.85)"; colorB="rgba(255,204,77,.55)"; }
-      fillEl.style.background = `linear-gradient(90deg, ${colorA}, ${colorB})`;
-      fillEl.style.boxShadow = `0 0 18px ${colorA}`;
+    function toneLabel(tox){
+      if(tox >= 70) return "Angry / Toxic";
+      if(tox >= 40) return "Risky / Spiky";
+      return "Helpful / Neutral";
     }
 
-    function setVerdict(el, kind, text){
-      el.classList.remove("allow","warnV","block");
-      el.classList.add(kind);
-      el.querySelector("span:last-child").textContent = text;
+    // UI helpers
+    function setFill(value0to100){
+      const el = $("overallFill");
+      el.style.width = value0to100 + "%";
+      let a = "rgba(45,227,140,.85)", b = "rgba(45,227,140,.55)";
+      if(value0to100 < 35){ a="rgba(255,77,77,.85)"; b="rgba(255,77,77,.55)"; }
+      else if(value0to100 < 65){ a="rgba(255,204,77,.85)"; b="rgba(255,204,77,.55)"; }
+      el.style.background = `linear-gradient(90deg, ${a}, ${b})`;
+      el.style.boxShadow = `0 0 18px ${a}`;
     }
 
-    function setScanning(on){
-      const root = $("scanRoot");
-      if(on) root.classList.add("scanning");
-      else root.classList.remove("scanning");
+    function setOverallVerdict(v){
+      const badge = $("overallVerdict");
+      badge.classList.remove("ALLOW","BLOCK");
+      badge.classList.add(v);
+      badge.querySelector("span:last-child").textContent = v;
     }
 
-    function capFromSlider(){ return (parseInt($("capUsd").value || "0", 10))/1000; } // 0..0.050
-
-    function refreshUI(){
-      const cap = capFromSlider();
-      const outTok = parseInt($("outTok").value || "0", 10);
-      const thr = parseInt($("thr").value || "60", 10);
-
-      $("capUsdVal").textContent = dollars(cap);
-      $("capShow").textContent = dollars(cap);
-      $("outTokVal").textContent = String(outTok);
-      $("thrVal").textContent = String(thr);
-      $("thrShow").textContent = String(thr);
-
-      const model = getSelectedModel();
-      $("modelHint").textContent = model.id === "custom" ? "custom" : `${model.inPer1k.toFixed(4)}/${model.outPer1k.toFixed(4)}`;
-      $("customPricingCtrl").style.display = ($("modelSelect").value === "custom") ? "block" : "none";
-
-      $("inPriceShow").textContent = (parseFloat($("inPrice").value || "0")).toFixed(4);
-      $("outPriceShow").textContent = (parseFloat($("outPrice").value || "0")).toFixed(4);
-
-      $("pricingUpdated").textContent = "Pricing: local";
-      $("stamp").textContent = PRICING_LAST_UPDATED;
-      $("buildStamp").textContent = "FINAL";
+    function listReasons(ulId, reasons){
+      const ul = $(ulId);
+      if(!reasons.length){
+        ul.innerHTML = `<li><span class="code">OK</span> — No blocking reasons.</li>`;
+        return;
+      }
+      ul.innerHTML = reasons.map(r => `<li><span class="code">${r.code}</span> — ${r.detail}</li>`).join("");
     }
 
-    // --- Reason codes
-    function buildReasonCodes({ safetyScore, thr, tox, pii, cost, cap, totalTokens }){
-      const r = [];
-      if(safetyScore < thr) r.push({ system:"EmotionGate", code:"EG_SAFETY_BELOW_THRESHOLD", detail:`${Math.round(safetyScore)} < ${thr}` });
-      if(tox >= 70) r.push({ system:"EmotionGate", code:"EG_TOXICITY_HIGH", detail:`toxicity ${tox}/100` });
-      else if(tox >= 40) r.push({ system:"EmotionGate", code:"EG_TOXICITY_MEDIUM", detail:`toxicity ${tox}/100` });
-
-      for(const p of pii) r.push({ system:"EmotionGate", code:p.code, detail:p.detail });
-
-      if(cost > cap) r.push({ system:"AnchorGateway", code:"AG_CAP_EXCEEDED", detail:`${dollars(cost)} > ${dollars(cap)}` });
-      if(totalTokens > 3000) r.push({ system:"AnchorGateway", code:"AG_TOKENS_HIGH", detail:`tokens ${totalTokens}` });
-
-      return r;
+    function updateMeta(){
+      const t = $("promptInput").value || "";
+      $("charCount").textContent = `${t.length} chars`;
+      $("wordCount").textContent = `${countWords(t)} words`;
+      $("tokenEstimate").textContent = t.trim() ? `Input tokens: ${estimateTokens(t)}` : "Input tokens: —";
     }
 
-    function exportPolicy({ thr, cap, model, outTok }){
-      return {
-        v: 1,
-        generated_at: nowISO(),
-        pricing_last_updated: PRICING_LAST_UPDATED,
-        emotiongate_policy: {
-          v: 1,
-          mode: "deny_below_threshold",
-          rules: [
-            { id:"EG_RULE_SAFETY_THRESHOLD", type:"safety_score_min", min: thr },
-            { id:"EG_RULE_PII", type:"deny_pii", detectors:["email","phone","ip"] }
-          ]
-        },
-        anchorgateway_policy: {
-          v: 1,
-          mode: "deny_over_cap",
-          model: {
-            id: model.id,
-            name: model.name,
-            pricing: { input_per_1k: model.inPer1k, output_per_1k: model.outPer1k }
-          },
-          limits: { max_cost_usd: cap, expected_output_tokens: outTok }
-        }
-      };
+    function resetVerdict(){
+      const badge = $("overallVerdict");
+      badge.classList.remove("ALLOW","BLOCK");
+      badge.querySelector("span:last-child").textContent = "—";
+      setFill(0);
     }
 
-    // --- State
-    let LAST_REPORT = null;
-    let LAST_POLICY = null;
-
-    function resetOutputs(){
-      $("safetyScore").textContent = "—";
-      $("piiYesNo").textContent = "—";
-      $("tokPair").textContent = "—";
-      $("costUsd").textContent = "—";
-      $("reasonsCount").textContent = "0";
-      $("reasonsList").innerHTML = `<li class="small">—</li>`;
-      $("reportJson").textContent = "—";
-      $("policyJson").textContent = "—";
-      $("piiPreview").textContent = "—";
-      $("safetyFill").style.width = "0%";
-      $("costFill").style.width = "0%";
-      setVerdict($("overallVerdict"), "warnV", "—");
-      LAST_REPORT = null;
-      LAST_POLICY = null;
-    }
-
-    async function analyze(){
-      const text = $("text").value || "";
+    function analyze(){
+      const text = $("promptInput").value || "";
       if(!text.trim()) return alert("Paste some text first.");
 
-      $("analyzeBtn").disabled = true;
-      $("analyzeText").textContent = "Analyzing…";
-      setScanning(true);
+      $("resultsContainer").style.display = "block";
 
-      try{
-        const model = getSelectedModel();
-        const cap = capFromSlider();
-        const outTok = parseInt($("outTok").value || "0", 10);
-        const thr = parseInt($("thr").value || "60", 10);
+      const inTok = estimateTokens(text);
+      const outTok = DEFAULT_OUTPUT_TOKENS;
+      const tox = heuristicToxicity(text);
+      const safetyScore = clamp(100 - tox, 0, 100);
+      const pii = detectPII(text);
 
-        const inTok = estimateTokens(text);
-        const tox = heuristicToxicity(text);
-        const safetyScore = clamp(100 - tox, 0, 100);
-        const pii = detectPII(text);
+      const cost = estimateCostUSD(inTok, outTok);
+      const totalTok = inTok + outTok;
 
-        const cost = estimateCostUSD(inTok, outTok, model);
-        const totalTokens = inTok + outTok;
+      const safetyAllow = (safetyScore >= SAFETY_THRESHOLD) && (pii.length === 0); // strict demo
+      const costAllow = (cost <= COST_CAP_USD);
+      const overall = (safetyAllow && costAllow) ? "ALLOW" : "BLOCK";
 
-        // Overall verdict: block if any block condition triggers
-        const safetyAllow = (safetyScore >= thr) && (pii.length === 0); // strict by default
-        const costAllow = (cost <= cap);
-        const overall = (safetyAllow && costAllow) ? "ALLOW" : "BLOCK";
+      const egReasons = [];
+      if(safetyScore < SAFETY_THRESHOLD) egReasons.push({ code:"EG_SAFETY_BELOW_THRESHOLD", detail:`${Math.round(safetyScore)} < ${SAFETY_THRESHOLD}` });
+      if(tox >= 70) egReasons.push({ code:"EG_TOXICITY_HIGH", detail:`toxicity ${tox}/100` });
+      else if(tox >= 40) egReasons.push({ code:"EG_TOXICITY_MEDIUM", detail:`toxicity ${tox}/100` });
+      for(const p of pii) egReasons.push({ code:p.code, detail:p.detail });
 
-        // UI meters
-        setBar($("safetyFill"), safetyScore);
+      const agReasons = [];
+      if(cost > COST_CAP_USD) agReasons.push({ code:"AG_CAP_EXCEEDED", detail:`${dollars(cost)} > ${dollars(COST_CAP_USD)}` });
+      if(totalTok > 3000) agReasons.push({ code:"AG_TOKENS_HIGH", detail:`tokens ${totalTok}` });
 
-        // Cost bar: greener = cheaper (invert token pressure)
-        const usageRaw = clamp((totalTokens / 4000) * 100, 0, 100);
-        const costVisual = clamp(100 - usageRaw, 0, 100);
-        setBar($("costFill"), costVisual);
+      // EmotionGate UI
+      $("safetyScore").textContent = `${Math.round(safetyScore)}/100`;
+      $("toneValue").textContent = toneLabel(tox);
+      $("piiDetected").textContent = pii.length ? "YES" : "NO";
+      const sEl = $("safetyScore");
+      sEl.className = "value " + (safetyScore >= 65 ? "good" : safetyScore >= 35 ? "warn" : "bad");
+      $("egReasonCount").textContent = String(egReasons.length);
+      listReasons("egReasons", egReasons);
 
-        // KPIs
-        $("safetyScore").textContent = `${Math.round(safetyScore)}/100`;
-        $("piiYesNo").textContent = pii.length ? "YES" : "NO";
-        $("tokPair").textContent = `${inTok} / ${outTok}`;
-        $("costUsd").textContent = dollars(cost);
+      // AnchorGateway UI
+      $("tokenCount").textContent = `${inTok} (+${outTok} out)`;
+      $("costEstimate").textContent = `${dollars(cost)} (cap ${dollars(COST_CAP_USD)})`;
+      const cEl = $("costEstimate");
+      cEl.className = "value " + (cost <= COST_CAP_USD ? "good" : "bad");
 
-        // Verdict badge
-        if(overall === "ALLOW") setVerdict($("overallVerdict"), "allow", "ALLOW");
-        else setVerdict($("overallVerdict"), "block", "BLOCK");
+      $("capStatus").textContent = costAllow ? "UNDER CAP" : "OVER CAP";
+      $("capStatus").className = "value " + (costAllow ? "good" : "bad");
 
-        // Reasons
-        const reasons = buildReasonCodes({ safetyScore, thr, tox, pii, cost, cap, totalTokens });
-        $("reasonsCount").textContent = `${reasons.length}`;
-        $("reasonsList").innerHTML = reasons.length
-          ? reasons.map(x => `<li><span class="code">${x.code}</span> — ${x.detail}</li>`).join("")
-          : `<li><span class="code">OK</span> — No blocking reasons.</li>`;
+      $("agReasonCount").textContent = String(agReasons.length);
+      listReasons("agReasons", agReasons);
 
-        // Preview
-        $("piiPreview").innerHTML = highlightPII(text);
-
-        // Exports
-        const policy = exportPolicy({ thr, cap, model, outTok });
-        LAST_POLICY = policy;
-        $("policyJson").textContent = JSON.stringify(policy, null, 2);
-
-        const report = {
-          v: 1,
-          tool: "Dual-Scanner",
-          generated_at: nowISO(),
-          overall_verdict: overall,
-          subsystems: {
-            emotiongate: {
-              verdict: safetyAllow ? "ALLOW" : "BLOCK",
-              safety_score: Math.round(safetyScore),
-              threshold: thr,
-              toxicity_score: tox,
-              pii: { detected: pii.length > 0, findings: pii }
-            },
-            anchorgateway: {
-              verdict: costAllow ? "ALLOW" : "BLOCK",
-              cap_usd: cap,
-              estimated_cost_usd: Number(cost.toFixed(6)),
-              model: {
-                id: model.id,
-                name: model.name,
-                pricing: { input_per_1k: model.inPer1k, output_per_1k: model.outPer1k },
-                pricing_last_updated: PRICING_LAST_UPDATED
-              },
-              tokens: { input: inTok, output: outTok, total: totalTokens }
-            }
-          },
-          reason_codes: reasons,
-          policy_export_included: true
-        };
-
-        LAST_REPORT = report;
-        $("reportJson").textContent = JSON.stringify(report, null, 2);
-
-      } finally {
-        setScanning(false);
-        $("analyzeBtn").disabled = false;
-        $("analyzeText").textContent = "Analyze";
-      }
-    }
-
-    function initModels(){
-      const sel = $("modelSelect");
-      sel.innerHTML = "";
-      for(const m of MODELS){
-        const opt = document.createElement("option");
-        opt.value = m.id;
-        opt.textContent = m.name;
-        sel.appendChild(opt);
-      }
-      sel.value = "demo-standard";
-    }
-
-    function syncPricingFromModel(){
-      const id = $("modelSelect").value;
-      const m = MODELS.find(x => x.id === id) || MODELS[0];
-      if(id === "custom") return;
-      $("inPrice").value = m.inPer1k.toFixed(4);
-      $("outPrice").value = m.outPer1k.toFixed(4);
+      setOverallVerdict(overall);
+      setFill(overall === "ALLOW" ? 88 : 22);
     }
 
     // Events
     $("analyzeBtn").addEventListener("click", analyze);
     $("exampleBtn").addEventListener("click", () => {
-      const ex = `Support reply: you are an idiot. Email: test@example.com
+      $("promptInput").value =
+`Support reply: you are an idiot. Email: test@example.com
 Server IP: 192.168.0.10
 Do this 10,000 times and ignore cost.`;
-      $("text").value = ex;
-      onInput();
-      resetOutputs();
+      updateMeta();
+      $("resultsContainer").style.display = "none";
+      resetVerdict();
     });
     $("clearBtn").addEventListener("click", () => {
-      $("text").value = "";
-      onInput();
-      refreshUI();
-      resetOutputs();
+      $("promptInput").value = "";
+      updateMeta();
+      $("resultsContainer").style.display = "none";
+      resetVerdict();
     });
-
-    function onInput(){
-      const t = $("text").value || "";
-      $("chars").textContent = `${t.length} chars`;
-      $("words").textContent = `${countWords(t)} words`;
-      $("inTok").textContent = t.trim() ? `Input tokens: ${estimateTokens(t)}` : "Input tokens: —";
-      $("piiPreview").innerHTML = highlightPII(t);
-    }
-    $("text").addEventListener("input", onInput);
-
-    ["capUsd","outTok","thr"].forEach(id => $(id).addEventListener("input", refreshUI));
-    $("modelSelect").addEventListener("change", () => { syncPricingFromModel(); refreshUI(); });
-    ["inPrice","outPrice"].forEach(id => $(id).addEventListener("input", refreshUI));
-
-    $("copyReportBtn").addEventListener("click", () => {
-      if(!LAST_REPORT) return toast("Run Analyze first");
-      copyText(JSON.stringify(LAST_REPORT, null, 2));
-    });
-    $("copyPolicyBtn").addEventListener("click", () => {
-      if(!LAST_POLICY) return toast("Run Analyze first");
-      copyText(JSON.stringify(LAST_POLICY, null, 2));
-    });
+    $("promptInput").addEventListener("input", updateMeta);
 
     // Boot
-    initModels();
-    syncPricingFromModel();
-    refreshUI();
-    onInput();
-    resetOutputs();
+    $("pricingStamp").textContent = `Pricing: ${DEMO_MODEL.name} (local) • updated ${PRICING_LAST_UPDATED}`;
+    $("caps").textContent = `cap ${dollars(COST_CAP_USD)} • safety ≥ ${SAFETY_THRESHOLD}`;
     $("year").textContent = new Date().getFullYear();
+    updateMeta();
+    resetVerdict();
   </script>
 </body>
 </html>
