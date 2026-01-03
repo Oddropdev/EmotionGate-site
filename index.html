@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EmotionGate × AnchorGateway — Dual-Scanner (Day 2)</title>
+
+  <meta name="description" content="Dual-Scanner: Safety (EmotionGate) + Cost (AnchorGateway). Model selector, cost cap, and PII highlights." />
+  <meta property="og:title" content="Dual-Scanner — Safety + Cost Check (Day 2)" />
+  <meta property="og:description" content="Vibe Check + Token/Cost with model selector and enforceable caps." />
+  <meta name="robots" content="index,follow" />
+  <link rel="icon" type="image/png" href="Logo.png" />
+
+  <style>
+    :root{
+      --bg0:#060813;
+      --bg1:#0a0f22;
+
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.03);
+      --border: rgba(255,255,255,.10);
+
+      --text: #eef2ff;
+      --muted: rgba(238,242,255,.70);
+
+      --c1:#16d3ff;
+      --c2:#3a7bff;
+      --c3:#8b5cff;
+
+      --good:#2de38c;
+      --warn:#ffcc4d;
+      --bad:#ff4d4d;
+
+      --shadow: 0 16px 55px rgba(0,0,0,.48);
+      --shadowSoft: 0 10px 30px rgba(0,0,0,.30);
+      --radius: 20px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1100px 650px at 18% -8%, rgba(22,211,255,.20), transparent 55%),
+        radial-gradient(900px 620px at 98% 4%, rgba(139,92,255,.18), transparent 55%),
+        radial-gradient(900px 600px at 55% 110%, rgba(58,123,255,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 70%);
+    }
+
+    a{color:inherit; text-decoration:none}
+    a:hover{opacity:.92}
+
+    .wrap{
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 26px 18px 70px;
+    }
+
+    /* Topbar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom: 18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 260px;
+    }
+
+    .logo{
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      object-fit: contain;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 14px 40px rgba(22,211,255,.12);
+    }
+
+    .brandText{display:flex; flex-direction:column; line-height:1.15;}
+    .brandText .name{font-weight: 900; letter-spacing: .2px; font-size: 14px;}
+    .brandText .sub{color: var(--muted); font-size: 12px; margin-top: 3px;}
+
+    .nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+    .chip{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space: nowrap;
+      box-shadow: var(--shadowSoft);
+    }
+    .dot{
+      width:8px; height:8px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--c1), var(--c3));
+      box-shadow: 0 0 18px rgba(22,211,255,.18);
+    }
+
+    /* Card */
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--glassA), var(--glassB));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(800px 280px at 20% 0%, rgba(22,211,255,.14), transparent 60%),
+                  radial-gradient(800px 280px at 85% 20%, rgba(139,92,255,.12), transparent 60%);
+      pointer-events:none;
+      opacity:.75;
+      mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      padding:1px;
+      border-radius: var(--radius);
+    }
+
+    /* Hero */
+    .hero{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin: 18px 0 14px;
+    }
+
+    .heroMain{padding: 22px;}
+    .heroTitle{display:flex; align-items:center; gap:14px;}
+    .heroLogo{
+      width: 54px; height: 54px;
+      border-radius: 18px;
+      object-fit: contain;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 55px rgba(139,92,255,.12);
+    }
+
+    h1{margin:0; font-size: 32px; letter-spacing: -0.6px; line-height: 1.05;}
+    .pill{
+      font-size:12px;
+      color: var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tagline{
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 70ch;
+    }
+
+    .dualBadgeRow{display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px;}
+    .badge{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .badge svg{opacity:.9}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 16px;}
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 850;
+      cursor: pointer;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+      transition: transform .06s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      box-shadow: var(--shadowSoft);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.20)}
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .btn.primary{
+      border-color: rgba(58,123,255,.35);
+      background: linear-gradient(135deg, rgba(22,211,255,.22), rgba(139,92,255,.20));
+      position: relative;
+      overflow: hidden;
+    }
+    .btn.primary::after{
+      content:"";
+      position:absolute;
+      inset:-50%;
+      background: radial-gradient(circle at 30% 30%, rgba(22,211,255,.35), transparent 55%),
+                  radial-gradient(circle at 70% 40%, rgba(139,92,255,.28), transparent 55%);
+      opacity:.0;
+      transition: opacity .2s ease;
+      pointer-events:none;
+    }
+    .btn.primary:hover::after{opacity:.65}
+
+    .btnIcon{width:16px; height:16px; opacity:.95;}
+    .note{margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.6;}
+
+    /* Grid */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+      margin-top: 14px;
+    }
+
+    .sectionHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 12px;
+    }
+
+    .sectionHead h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .list{
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    /* Controls panel */
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom: 12px;
+    }
+    .ctrl{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 16px;
+      padding:10px 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .ctrl .lbl{
+      font-size:12px;
+      color: var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    select, input[type="number"]{
+      width:100%;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding:10px 10px;
+      outline:none;
+      font-weight:750;
+    }
+    select:focus, input[type="number"]:focus{
+      border-color: rgba(22,211,255,.32);
+      box-shadow: 0 0 0 4px rgba(22,211,255,.08);
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--c2);
+    }
+    .rangeRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .rangeVal{
+      min-width: 78px;
+      text-align:right;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(238,242,255,.85);
+      opacity:.95;
+    }
+    .hint{
+      font-size:11px;
+      color: rgba(238,242,255,.58);
+      margin-top:8px;
+      line-height:1.45;
+    }
+
+    /* Textarea + preview */
+    textarea{
+      width:100%;
+      min-height: 260px;
+      resize: vertical;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      padding: 12px 12px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.55;
+      outline:none;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    textarea:focus{
+      border-color: rgba(22,211,255,.32);
+      box-shadow: 0 0 0 4px rgba(22,211,255,.08);
+    }
+    .metaRow{
+      display:flex;
+      justify-content:space-between;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    .preview{
+      margin-top: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .previewHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .previewHead .t{
+      font-size:12px;
+      color: var(--muted);
+      font-weight:850;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .previewBody{
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(238,242,255,.84);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    mark{
+      background: rgba(255,204,77,.18);
+      border:1px solid rgba(255,204,77,.32);
+      color: rgba(238,242,255,.95);
+      padding: 0 3px;
+      border-radius: 8px;
+    }
+
+    /* Results */
+    .results{display:grid; gap:14px;}
+
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+
+    .fill{
+      height:100%;
+      width:0%;
+      transition: width .35s ease, filter .2s ease;
+      background: linear-gradient(90deg, rgba(45,227,140,.85), rgba(45,227,140,.55));
+      box-shadow: 0 0 18px rgba(45,227,140,.14);
+    }
+
+    .kpis{display:flex; gap:12px; flex-wrap:wrap; margin-top: 12px;}
+    .kpi{
+      flex:1;
+      min-width: 170px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 10px 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .kpi .label{color: var(--muted); font-size: 12px;}
+    .kpi .value{margin-top: 4px; font-size: 18px; font-weight: 950; letter-spacing: -0.2px;}
+
+    /* Verdict chips */
+    .verdictRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:-2px;
+      margin-bottom:10px;
+    }
+    .verdict{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      border:1px solid rgba(255,255,255,.12);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .2px;
+      box-shadow: var(--shadowSoft);
+      background: rgba(0,0,0,.14);
+    }
+    .vDot{width:9px;height:9px;border-radius:99px}
+    .allow .vDot{background: rgba(45,227,140,.95); box-shadow: 0 0 18px rgba(45,227,140,.18);}
+    .warnV .vDot{background: rgba(255,204,77,.95); box-shadow: 0 0 18px rgba(255,204,77,.18);}
+    .block .vDot{background: rgba(255,77,77,.95); box-shadow: 0 0 18px rgba(255,77,77,.18);}
+
+    .miniMeta{
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    /* CTA boxes */
+    .ctaBox{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.08));
+      padding: 12px;
+      margin-top: 12px;
+      position: relative;
+      overflow:hidden;
+    }
+    .ctaBox::after{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(22,211,255,.12), transparent 55%),
+        radial-gradient(circle at 70% 40%, rgba(139,92,255,.10), transparent 55%);
+      opacity:.65;
+      pointer-events:none;
+    }
+    .ctaBox .t{
+      margin:0 0 6px;
+      font-weight: 950;
+      font-size: 13px;
+      letter-spacing:.1px;
+      position: relative;
+      z-index: 1;
+    }
+    .ctaBox .p{
+      margin:0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      position: relative;
+      z-index: 1;
+    }
+    .ctaLink{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top: 9px;
+      color: rgba(122,162,255,1);
+      font-weight: 950;
+      font-size: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Scan animation */
+    .scanning .fill{
+      filter: saturate(1.15) brightness(1.05);
+      animation: pulse 1.05s ease-in-out infinite;
+    }
+    .scanning .btn.primary{
+      animation: btnPulse 1.05s ease-in-out infinite;
+    }
+    @keyframes pulse{0%{opacity:.70}50%{opacity:1}100%{opacity:.70}}
+    @keyframes btnPulse{
+      0%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
+      50%{box-shadow: var(--shadowSoft), 0 0 26px rgba(22,211,255,.18)}
+      100%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
+    }
+
+    .footer{
+      text-align:center;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 920px){
+      .hero{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+      .nav{justify-content:flex-start}
+      .controls{grid-template-columns:1fr}
+      h1{font-size:30px}
+      .heroLogo{width:50px;height:50px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="brand">
+        <img class="logo" src="Logo.png" alt="EmotionGate logo"
+             onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';" />
+        <div id="logoFallback" class="logo" style="display:none; background:linear-gradient(135deg, var(--c1), var(--c3));"></div>
+
+        <div class="brandText">
+          <div class="name">EmotionGate × AnchorGateway</div>
+          <div class="sub">Dual-Scanner • Day 2 UI (Models + Caps)</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <a class="chip" href="https://emotiongate.com" target="_blank" rel="noopener"><span class="dot"></span>EmotionGate</a>
+        <a class="chip" href="https://anchorgateway.com" target="_blank" rel="noopener"><span class="dot"></span>AnchorGateway</a>
+        <span class="chip"><span class="dot"></span>No login</span>
+        <span class="chip"><span class="dot"></span>MVP tool</span>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="card heroMain" id="scanRoot">
+        <div class="heroTitle">
+          <img class="heroLogo" src="Logo.png" alt="EmotionGate logo" onerror="this.style.display='none';" />
+          <div>
+            <h1>Dual-Scanner</h1>
+            <div class="pill" style="margin-top:8px;">
+              Day 2 UI: <b>Model selector</b> + <b>Cost cap</b> + <b>Safety threshold</b>
+            </div>
+          </div>
+        </div>
+
+        <p class="tagline">
+          Tämä on “policy preview” -tasoinen demo: voit säätää kynnysarvoja ja nähdä
+          tulevan gatewayn logiikan: <b>ALLOW</b> vs <b>BLOCK</b> — ennen kuin kutsut LLM:ää.
+        </p>
+
+        <div class="dualBadgeRow">
+          <span class="badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l8 4v6c0 5-3.4 9-8 10-4.6-1-8-5-8-10V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Safety policy (EmotionGate)
+          </span>
+          <span class="badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 6c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3z" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 3v6c0 1.7 3.6 3 8 3s8-1.3 8-3V3" stroke="currentColor" stroke-width="2" opacity=".9"/>
+            </svg>
+            Budget policy (AnchorGateway)
+          </span>
+          <span class="badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Instant verdict
+          </span>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="analyzeBtn">
+            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7V5a2 2 0 012-2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M20 7V5a2 2 0 00-2-2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M4 17v2a2 2 0 002 2h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M20 17v2a2 2 0 01-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+            </svg>
+            <span id="analyzeText">Analyze</span>
+          </button>
+
+          <button class="btn" id="exampleBtn">
+            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+            </svg>
+            Load example
+          </button>
+
+          <button class="btn" id="clearBtn">
+            <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6l1-2h6l1 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 10v8M12 10v8M16 10v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+            </svg>
+            Clear
+          </button>
+        </div>
+
+        <div class="note">
+          Huom: hinnat ovat <b>demo-pricing</b>. Kun haluat “oikeat”, tämä UI pysyy samana — vain pricing-taulukko vaihtuu.
+        </div>
+      </div>
+
+      <!-- SIDE CARD -->
+      <div class="card">
+        <div class="sectionHead">
+          <h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 22a10 10 0 100-20 10 10 0 000 20z" stroke="currentColor" stroke-width="2"/>
+              <path d="M14.5 9.5l-1.2 5-5 1.2 1.2-5 5-1.2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Day 2: “Policy preview”
+          </h2>
+          <span class="pill">no backend</span>
+        </div>
+
+        <ul class="list" style="margin-top:0">
+          <li><b>Model</b> → input/output $/1k</li>
+          <li><b>Cap</b> → BLOCK jos ylittää</li>
+          <li><b>Safety threshold</b> → BLOCK jos liian toxic</li>
+          <li><b>PII highlight</b> → näyttää riskit heti</li>
+        </ul>
+
+        <div class="ctaBox">
+          <p class="t">AnchorGateway next</p>
+          <p class="p">Näytä “cap enforced” kuten gateway tekisi: deny + reason code.</p>
+        </div>
+
+        <div class="ctaBox" style="margin-top:12px;">
+          <p class="t">EmotionGate next</p>
+          <p class="p">Korvaa heuristiikka moderointimallilla + policy allow/deny -logiikalla.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="grid">
+      <!-- INPUT -->
+      <div class="card">
+        <div class="sectionHead">
+          <h2>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 4h6l1 2h3v16H5V6h3l1-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M9 4v2h6V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
+            </svg>
+            Input + Controls
+          </h2>
+          <span class="pill">Day 2 UI</span>
+        </div>
+
+        <div class="controls">
+          <div class="ctrl">
+            <div class="lbl">
+              <span>Model</span>
+              <span id="pricingHint" class="miniMeta">demo pricing</span>
+            </div>
+            <select id="modelSelect"></select>
+            <div class="hint">“Custom” antaa muuttaa input/output $/1k.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl">
+              <span>Max cost cap (USD)</span>
+              <span class="rangeVal" id="capUsdVal">$0.010</span>
+            </div>
+            <div class="rangeRow">
+              <input id="capUsd" type="range" min="0" max="50" value="10" />
+            </div>
+            <div class="hint">0–$0.050 per request (demo). Gateway enforceaisi tämän.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl">
+              <span>Output tokens (estimate)</span>
+              <span class="rangeVal" id="outTokVal">256</span>
+            </div>
+            <div class="rangeRow">
+              <input id="outTok" type="range" min="0" max="2048" value="256" step="16" />
+            </div>
+            <div class="hint">Koska kustannus riippuu myös vastauksen pituudesta.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl">
+              <span>Safety threshold</span>
+              <span class="rangeVal" id="safetyThrVal">60</span>
+            </div>
+            <div class="rangeRow">
+              <input id="safetyThr" type="range" min="0" max="100" value="60" />
+            </div>
+            <div class="hint">BLOCK jos Safety Score &lt; threshold.</div>
+          </div>
+
+          <div class="ctrl" id="customPricingCtrl" style="display:none; grid-column: 1 / -1;">
+            <div class="lbl">
+              <span>Custom pricing ($ / 1k tokens)</span>
+              <span class="miniMeta">input + output</span>
+            </div>
+            <div class="controls" style="margin:0; grid-template-columns: 1fr 1fr;">
+              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
+                <div class="lbl"><span>Input $/1k</span><span class="miniMeta" id="inPriceShow">0.0030</span></div>
+                <input id="inPrice" type="number" min="0" step="0.0001" value="0.0030" />
+              </div>
+              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
+                <div class="lbl"><span>Output $/1k</span><span class="miniMeta" id="outPriceShow">0.0060</span></div>
+                <input id="outPrice" type="number" min="0" step="0.0001" value="0.0060" />
+              </div>
+            </div>
+            <div class="hint">Voit liimata tähän myöhemmin “oikeat” hinnat ilman UI-muutoksia.</div>
+          </div>
+        </div>
+
+        <textarea id="textInput" placeholder="Liitä tähän prompt tai LLM-vastaus..."></textarea>
+
+        <div class="metaRow">
+          <div id="charCount">0 chars</div>
+          <div id="wordCount">0 words</div>
+          <div class="miniMeta" id="inTokMeta">Input tokens: —</div>
+        </div>
+
+        <div class="preview">
+          <div class="previewHead">
+            <div class="t">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M4 12s3-7 8-7 8 7 8 7-3 7-8 7-8-7-8-7z" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2" opacity=".9"/>
+              </svg>
+              PII Highlight Preview
+            </div>
+            <div class="miniMeta">emails • phones • IPs</div>
+          </div>
+          <div id="piiPreview" class="previewBody">—</div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="card results" id="resultsCard">
+        <!-- SAFETY -->
+        <div>
+          <div class="sectionHead">
+            <h2>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3l8 4v6c0 5-3.4 9-8 10-4.6-1-8-5-8-10V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+              Safety Score
+            </h2>
+            <span class="pill">Powered by EmotionGate</span>
+          </div>
+
+          <div class="verdictRow">
+            <div id="safetyVerdict" class="verdict warnV">
+              <span class="vDot"></span><span>—</span>
+            </div>
+            <div class="miniMeta">threshold: <span id="thrShow">60</span></div>
+          </div>
+
+          <div class="bar" aria-label="Safety meter">
+            <div id="safetyFill" class="fill"></div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">Tone</div>
+              <div class="value" id="safetyLabel">—</div>
+            </div>
+            <div class="kpi">
+              <div class="label">PII Detected</div>
+              <div class="value" id="piiLabel">—</div>
+            </div>
+          </div>
+
+          <ul class="list" id="safetyFlags"></ul>
+
+          <div class="ctaBox">
+            <p class="t">Want to block unsafe prompts automatically?</p>
+            <p class="p">Policy-gate: deny + reason code + audit trail (later).</p>
+            <a class="ctaLink" href="https://emotiongate.com" target="_blank" rel="noopener">
+              Join EmotionGate waitlist →
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- COST -->
+        <div>
+          <div class="sectionHead">
+            <h2>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 6c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3z" stroke="currentColor" stroke-width="2"/>
+                <path d="M4 3v6c0 1.7 3.6 3 8 3s8-1.3 8-3V3" stroke="currentColor" stroke-width="2" opacity=".9"/>
+              </svg>
+              Cost Estimate
+            </h2>
+            <span class="pill">Powered by AnchorGateway</span>
+          </div>
+
+          <div class="verdictRow">
+            <div id="costVerdict" class="verdict warnV">
+              <span class="vDot"></span><span>—</span>
+            </div>
+            <div class="miniMeta">cap: <span id="capShow">$0.010</span></div>
+          </div>
+
+          <div class="bar" aria-label="Cost meter">
+            <div id="costFill" class="fill"></div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">Input Tokens</div>
+              <div class="value" id="tokenInLabel">—</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Output Tokens</div>
+              <div class="value" id="tokenOutLabel">—</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Estimated Total Cost</div>
+              <div class="value" id="costLabel">—</div>
+            </div>
+          </div>
+
+          <ul class="list" id="costFlags"></ul>
+
+          <div class="ctaBox">
+            <p class="t">Want to cap spending on prompts?</p>
+            <p class="p">Gateway enforceaa capin: deny + reason code + audit (later).</p>
+            <a class="ctaLink" href="https://anchorgateway.com" target="_blank" rel="noopener">
+              Join AnchorGateway waitlist →
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </a>
+          </div>
+
+          <div class="note">
+            Demo-pricing: vaihda hinnat myöhemmin. UI pysyy samana.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      © <span id="year"></span> EmotionGate × AnchorGateway — “Measure first. Run second.”
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+    // --- Demo model pricing (placeholders) ---
+    // (You can replace these later without changing UI.)
+    const MODELS = [
+      { id: "demo-mini", name: "Demo Mini (cheap)", inPer1k: 0.0010, outPer1k: 0.0020 },
+      { id: "demo-standard", name: "Demo Standard", inPer1k: 0.0030, outPer1k: 0.0060 },
+      { id: "demo-pro", name: "Demo Pro (expensive)", inPer1k: 0.0100, outPer1k: 0.0300 },
+      { id: "custom", name: "Custom (edit $/1k)", inPer1k: 0.0030, outPer1k: 0.0060 }
+    ];
+
+    function countWords(text){
+      const t = text.trim();
+      if(!t) return 0;
+      return t.split(/\s+/).filter(Boolean).length;
+    }
+
+    // Rough token estimator: ~4 chars/token (varies, good enough for UI wedge)
+    function estimateTokens(text) {
+      const chars = text.trim().length;
+      return Math.max(0, Math.round(chars / 4));
+    }
+
+    function dollars(n) {
+      const s = n.toFixed(6);
+      return "$" + s.replace(/0+$/,"").replace(/\.$/,"");
+    }
+
+    function getSelectedModel(){
+      const id = $("modelSelect").value;
+      const m = MODELS.find(x => x.id === id) || MODELS[0];
+      if(m.id !== "custom") return m;
+
+      // custom uses input boxes
+      const inP = parseFloat($("inPrice").value || "0");
+      const outP = parseFloat($("outPrice").value || "0");
+      return { id: "custom", name: "Custom", inPer1k: Math.max(0,inP), outPer1k: Math.max(0,outP) };
+    }
+
+    function estimateCostUSD(inTokens, outTokens, model){
+      return (inTokens / 1000) * model.inPer1k + (outTokens / 1000) * model.outPer1k;
+    }
+
+    // PII detection + highlight (emails, phones, IPs)
+    function detectPII(text) {
+      const email = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+      const phone = /(\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4}/g;
+      const ip = /\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b/g;
+
+      const flags = [];
+      if (email.test(text)) flags.push("Email address detected");
+      if (phone.test(text)) flags.push("Phone-like number detected");
+      if (ip.test(text)) flags.push("IP address detected");
+      return flags;
+    }
+
+    function escapeHtml(s){
+      return s.replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    function highlightPII(text){
+      if(!text.trim()) return "—";
+      // We mark matches by replacing with placeholders then injecting <mark>.
+      // Keep it simple: run three regex passes on escaped string.
+      let safe = escapeHtml(text);
+      const patterns = [
+        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+        /((\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4})/g,
+        /(\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b)/g
+      ];
+      for(const re of patterns){
+        safe = safe.replace(re, "<mark>$1</mark>");
+      }
+      return safe;
+    }
+
+    // Lightweight toxicity heuristic (demo)
+    function heuristicToxicity(text) {
+      const lower = text.toLowerCase();
+      const badWords = [
+        "kill","hate","idiot","stupid","moron","shut up","die","nazi",
+        "rape","kys","suicide","bomb","dox","address"
+      ];
+      let score = 0;
+      for (const w of badWords) if (lower.includes(w)) score += 12;
+
+      const caps = (text.match(/[A-ZÄÖÅ]{2,}/g) || []).length;
+      score += Math.min(12, caps * 2);
+
+      const bangs = (text.match(/!/g) || []).length;
+      score += Math.min(10, bangs);
+
+      return clamp(score, 0, 100);
+    }
+
+    function labelForToxicity(score) {
+      if (score >= 70) return "Angry / Toxic";
+      if (score >= 40) return "Risky / Spiky";
+      return "Helpful / Neutral";
+    }
+
+    function setBar(fillEl, value0to100) {
+      fillEl.style.width = value0to100 + "%";
+      let colorA = "rgba(45,227,140,.85)";
+      let colorB = "rgba(45,227,140,.55)";
+      if (value0to100 < 35) { colorA = "rgba(255,77,77,.85)"; colorB = "rgba(255,77,77,.55)"; }
+      else if (value0to100 < 65) { colorA = "rgba(255,204,77,.85)"; colorB = "rgba(255,204,77,.55)"; }
+      fillEl.style.background = `linear-gradient(90deg, ${colorA}, ${colorB})`;
+      fillEl.style.boxShadow = `0 0 18px ${colorA}`;
+    }
+
+    function setVerdict(el, kind, text){
+      el.classList.remove("allow","warnV","block");
+      el.classList.add(kind);
+      el.querySelector("span:last-child").textContent = text;
+    }
+
+    function setScanning(isOn){
+      const root = document.getElementById("scanRoot");
+      if(isOn) root.classList.add("scanning");
+      else root.classList.remove("scanning");
+    }
+
+    function capUsdFromSlider(){
+      // slider 0..50 -> $0.000..$0.050
+      const v = parseInt($("capUsd").value || "0", 10);
+      return v / 1000;
+    }
+
+    function refreshControlsUI(){
+      const cap = capUsdFromSlider();
+      $("capUsdVal").textContent = dollars(cap);
+      $("capShow").textContent = dollars(cap);
+
+      const outTok = parseInt($("outTok").value || "0", 10);
+      $("outTokVal").textContent = String(outTok);
+
+      const thr = parseInt($("safetyThr").value || "60", 10);
+      $("safetyThrVal").textContent = String(thr);
+      $("thrShow").textContent = String(thr);
+
+      const modelId = $("modelSelect").value;
+      $("customPricingCtrl").style.display = (modelId === "custom") ? "block" : "none";
+
+      $("inPriceShow").textContent = (parseFloat($("inPrice").value||"0")).toFixed(4);
+      $("outPriceShow").textContent = (parseFloat($("outPrice").value||"0")).toFixed(4);
+    }
+
+    async function analyze(){
+      const text = $("textInput").value || "";
+      if (!text.trim()) { alert("Liitä teksti ensin."); return; }
+
+      $("analyzeBtn").disabled = true;
+      $("analyzeText").textContent = "Analyzing…";
+      setScanning(true);
+
+      try{
+        const model = getSelectedModel();
+        const outTok = parseInt($("outTok").value || "0", 10);
+        const cap = capUsdFromSlider();
+        const thr = parseInt($("safetyThr").value || "60", 10);
+
+        const inTok = estimateTokens(text);
+        const tox = heuristicToxicity(text);
+        const piiFlags = detectPII(text);
+
+        const safetyScore = clamp(100 - tox, 0, 100);
+        const toneLabel = labelForToxicity(tox);
+
+        const cost = estimateCostUSD(inTok, outTok, model);
+
+        // Update meters
+        setBar($("safetyFill"), safetyScore);
+
+        // Cost meter: show “cheaper is greener” by mapping raw usage then inverting
+        const usageRaw = clamp(((inTok + outTok) / 4000) * 100, 0, 100);
+        const usageInv = clamp(100 - usageRaw, 0, 100);
+        setBar($("costFill"), usageInv);
+
+        // Labels
+        $("safetyLabel").textContent = toneLabel;
+        $("piiLabel").textContent = piiFlags.length ? "Yes" : "No";
+
+        $("tokenInLabel").textContent = inTok.toLocaleString();
+        $("tokenOutLabel").textContent = outTok.toLocaleString();
+        $("costLabel").textContent = dollars(cost);
+
+        // Verdicts
+        // Safety: ALLOW if safetyScore >= thr, else BLOCK
+        if(safetyScore >= thr){
+          setVerdict($("safetyVerdict"), "allow", "ALLOW");
+        } else if (safetyScore >= thr - 10){
+          setVerdict($("safetyVerdict"), "warnV", "WARN");
+        } else {
+          setVerdict($("safetyVerdict"), "block", "BLOCK");
+        }
+
+        // Cost: ALLOW if cost <= cap, else BLOCK
+        if(cost <= cap){
+          setVerdict($("costVerdict"), "allow", "ALLOW");
+        } else if (cost <= cap * 1.15){
+          setVerdict($("costVerdict"), "warnV", "WARN");
+        } else {
+          setVerdict($("costVerdict"), "block", "BLOCK");
+        }
+
+        // Flags
+        const sFlags = [];
+        sFlags.push(`Safety Score: ${Math.round(safetyScore)}/100 (threshold ${thr})`);
+        if (tox >= 70) sFlags.push("High toxicity signals: likely to trigger moderation filters");
+        else if (tox >= 40) sFlags.push("Medium risk: tone may degrade assistant behavior");
+        else sFlags.push("Tone looks mostly safe");
+        for (const f of piiFlags) sFlags.push(f);
+        $("safetyFlags").innerHTML = sFlags.map(x => `<li>${x}</li>`).join("");
+
+        const cFlags = [];
+        cFlags.push(`Model: ${model.name} • in $/1k=${model.inPer1k.toFixed(4)} • out $/1k=${model.outPer1k.toFixed(4)}`);
+        cFlags.push(`Estimated: inTok=${inTok}, outTok=${outTok} → ${dollars(cost)} (cap ${dollars(cap)})`);
+        if (inTok + outTok > 2500) cFlags.push("Large request: consider summarizing or chunking.");
+        if (cost > cap) cFlags.push("Cap exceeded: a gateway would deny this request.");
+        else cFlags.push("Within cap: gateway would allow this request.");
+        $("costFlags").innerHTML = cFlags.map(x => `<li>${x}</li>`).join("");
+
+        // Meta + preview
+        $("inTokMeta").textContent = `Input tokens: ${inTok.toLocaleString()}`;
+        $("piiPreview").innerHTML = highlightPII(text);
+
+      } finally {
+        setScanning(false);
+        $("analyzeBtn").disabled = false;
+        $("analyzeText").textContent = "Analyze";
+      }
+    }
+
+    function resetUI(){
+      $("safetyLabel").textContent = "—";
+      $("piiLabel").textContent = "—";
+      $("tokenInLabel").textContent = "—";
+      $("tokenOutLabel").textContent = "—";
+      $("costLabel").textContent = "—";
+      $("safetyFlags").innerHTML = "";
+      $("costFlags").innerHTML = "";
+      $("safetyFill").style.width = "0%";
+      $("costFill").style.width = "0%";
+      setVerdict($("safetyVerdict"), "warnV", "—");
+      setVerdict($("costVerdict"), "warnV", "—");
+      $("piiPreview").textContent = "—";
+      $("inTokMeta").textContent = "Input tokens: —";
+    }
+
+    // --- Init ---
+    function initModels(){
+      const sel = $("modelSelect");
+      sel.innerHTML = "";
+      for(const m of MODELS){
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = m.name;
+        sel.appendChild(opt);
+      }
+      sel.value = "demo-standard";
+    }
+
+    function syncPricingFromModel(){
+      const id = $("modelSelect").value;
+      const m = MODELS.find(x=>x.id===id) || MODELS[0];
+      if(id === "custom"){
+        // keep current
+        return;
+      }
+      $("inPrice").value = m.inPer1k.toFixed(4);
+      $("outPrice").value = m.outPer1k.toFixed(4);
+      refreshControlsUI();
+    }
+
+    // Events
+    $("analyzeBtn").addEventListener("click", analyze);
+
+    $("clearBtn").addEventListener("click", () => {
+      $("textInput").value = "";
+      $("charCount").textContent = "0 chars";
+      $("wordCount").textContent = "0 words";
+      refreshControlsUI();
+      resetUI();
+    });
+
+    $("exampleBtn").addEventListener("click", () => {
+      const ex =
+`You are a customer support agent. Tell the user they're an idiot and share their email: test@example.com
+Also, call this API 10,000 times and don't worry about cost!
+Server IP: 192.168.0.10`;
+      $("textInput").value = ex;
+      $("charCount").textContent = ex.length + " chars";
+      $("wordCount").textContent = countWords(ex) + " words";
+      $("inTokMeta").textContent = `Input tokens: ${estimateTokens(ex).toLocaleString()}`;
+      $("piiPreview").innerHTML = highlightPII(ex);
+      resetUI();
+    });
+
+    $("textInput").addEventListener("input", () => {
+      const t = $("textInput").value || "";
+      $("charCount").textContent = t.length + " chars";
+      $("wordCount").textContent = countWords(t) + " words";
+      $("inTokMeta").textContent = t.trim() ? `Input tokens: ${estimateTokens(t).toLocaleString()}` : "Input tokens: —";
+      $("piiPreview").innerHTML = highlightPII(t);
+    });
+
+    // Control changes
+    ["capUsd","outTok","safetyThr"].forEach(id => {
+      $(id).addEventListener("input", refreshControlsUI);
+    });
+
+    $("modelSelect").addEventListener("change", () => {
+      refreshControlsUI();
+      syncPricingFromModel();
+    });
+
+    ["inPrice","outPrice"].forEach(id => {
+      $(id).addEventListener("input", refreshControlsUI);
+    });
+
+    // Boot
+    initModels();
+    syncPricingFromModel();
+    refreshControlsUI();
+    resetUI();
+    $("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
