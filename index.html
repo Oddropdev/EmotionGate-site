@@ -444,12 +444,10 @@
     function heuristicToxicity(text){
       const lower = text.toLowerCase();
 
-      // heavier weight on direct insults
       const insultWords = ["idiot","moron","stupid","dumb","trash","shut up"];
       let score = 0;
       for(const w of insultWords) if(lower.includes(w)) score += 18;
 
-      // broader aggressive keywords
       const badWords = ["kill","hate","die","nazi","rape","kys","suicide","bomb","dox","address"];
       for(const w of badWords) if(lower.includes(w)) score += 12;
 
@@ -466,6 +464,28 @@
       if(tox >= 70) return "Angry / Toxic";
       if(tox >= 40) return "Risky / Spiky";
       return "Helpful / Neutral";
+    }
+
+    // Micropolish: short tags for harmful codes
+    const HARM_TAGS = {
+      EG_BYPASS_SAFETY: "bypass",
+      EG_EXFILTRATION: "exfil",
+      EG_CREDENTIALS: "secrets",
+      EG_DESTRUCTIVE_OPS: "destructive",
+      EG_MALWARE_CHAIN: "malware-chain",
+      EG_NETWORK_ATTACK: "attack",
+      AG_COST_ABUSE: "cost-abuse"
+    };
+
+    function formatHarmFlags(findings){
+      if(!findings.length) return "0";
+      const tags = findings
+        .map(f => HARM_TAGS[f.code] || f.code.replace(/^EG_|^AG_/,"").toLowerCase())
+        .filter(Boolean);
+      const uniq = Array.from(new Set(tags));
+      const shown = uniq.slice(0, 4);
+      const more = uniq.length > 4 ? ` +${uniq.length - 4}` : "";
+      return `${uniq.length} (${shown.join(", ")}${more})`;
     }
 
     function setFill(value0to100){
@@ -518,10 +538,13 @@
       const outTok = DEFAULT_OUTPUT_TOKENS;
 
       const tox = heuristicToxicity(text);
-      const tone = toneLabel(tox);
 
       const pii = detectPII(text);
       const harm = detectHarmful(text);
+
+      // ✅ Change #1: Tone override when PII or harmful instructions exist
+      let tone = toneLabel(tox);
+      if (pii.length || harm.findings.length) tone = "Risky / Harmful";
 
       // Safety combines: toxicity + harmful-instruction score + hard penalty for PII
       const piiPenalty = pii.length ? 35 : 0;
@@ -531,7 +554,6 @@
       const cost = estimateCostUSD(inTok, outTok);
       const totalTok = inTok + outTok;
 
-      // Enforce preview
       const safetyAllow = (safetyScore >= SAFETY_THRESHOLD) && (pii.length === 0) && (harm.findings.length === 0);
       const costAllow = (cost <= COST_CAP_USD);
       const overall = (safetyAllow && costAllow) ? "ALLOW" : "BLOCK";
@@ -544,19 +566,24 @@
       else if(tox >= 40) egReasons.push({ code:"EG_TOXICITY_MEDIUM", detail:`toxicity ${tox}/100` });
 
       for(const p of pii) egReasons.push({ code:p.code, detail:p.detail });
-      for(const h of harm.findings) egReasons.push({ code:h.code, detail:h.detail });
+
+      // ✅ Change #3: EmotionGate shows only EG_* (not AG_*)
+      for(const h of harm.findings){
+        if(h.code.startsWith("EG_")) egReasons.push({ code:h.code, detail:h.detail });
+      }
 
       const agReasons = [];
       if(cost > COST_CAP_USD) agReasons.push({ code:"AG_CAP_EXCEEDED", detail:`${dollars(cost)} > ${dollars(COST_CAP_USD)}` });
       if(totalTok > 3000) agReasons.push({ code:"AG_TOKENS_HIGH", detail:`tokens ${totalTok}` });
-      // Mirror cost abuse signal into Anchor side too
       if(harm.findings.some(x => x.code === "AG_COST_ABUSE")) agReasons.push({ code:"AG_COST_ABUSE", detail:"Prompt suggests repeated-use / ignoring cost" });
 
       // EmotionGate UI
       $("safetyScore").textContent = `${Math.round(safetyScore)}/100`;
       $("toneValue").textContent = tone;
       $("piiDetected").textContent = pii.length ? "YES" : "NO";
-      $("harmFlags").textContent = harm.findings.length ? String(harm.findings.length) : "0";
+
+      // ✅ Micropolish: show tags
+      $("harmFlags").textContent = formatHarmFlags(harm.findings);
 
       const sEl = $("safetyScore");
       sEl.className = "value " + (safetyScore >= 65 ? "good" : safetyScore >= 35 ? "warn" : "bad");
@@ -577,7 +604,9 @@
       listReasons("agReasons", agReasons);
 
       setOverallVerdict(overall);
-      setFill(overall === "ALLOW" ? 88 : 22);
+
+      // ✅ Change #2: overall bar reflects safetyScore
+      setFill(safetyScore);
     }
 
     // Events
