@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="fi">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EmotionGate × AnchorGateway — Dual-Scanner (Day 2)</title>
+  <title>Dual-Scanner — Safety + Cost (FINAL)</title>
 
-  <meta name="description" content="Dual-Scanner: Safety (EmotionGate) + Cost (AnchorGateway). Model selector, cost cap, and PII highlights." />
-  <meta property="og:title" content="Dual-Scanner — Safety + Cost Check (Day 2)" />
-  <meta property="og:description" content="Vibe Check + Token/Cost with model selector and enforceable caps." />
+  <meta name="description" content="Dual-Scanner: Safety (EmotionGate) + Cost (AnchorGateway). Reason codes, report JSON, policy export." />
+  <meta property="og:title" content="Dual-Scanner — Safety + Cost" />
+  <meta property="og:description" content="Analyze text for safety + cost. Enforce preview with reason codes and exportable JSON." />
   <meta name="robots" content="index,follow" />
   <link rel="icon" type="image/png" href="Logo.png" />
 
@@ -15,11 +15,9 @@
     :root{
       --bg0:#060813;
       --bg1:#0a0f22;
-
       --glassA: rgba(255,255,255,.06);
       --glassB: rgba(255,255,255,.03);
       --border: rgba(255,255,255,.10);
-
       --text: #eef2ff;
       --muted: rgba(238,242,255,.70);
 
@@ -41,7 +39,6 @@
 
     *{box-sizing:border-box}
     html,body{height:100%}
-
     body{
       margin:0;
       font-family: var(--sans);
@@ -53,72 +50,13 @@
         linear-gradient(180deg, var(--bg0), var(--bg1) 70%);
     }
 
-    a{color:inherit; text-decoration:none}
-    a:hover{opacity:.92}
-
-    .wrap{
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 26px 18px 70px;
-    }
-
-    /* Topbar */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom: 18px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width: 260px;
-    }
-
-    .logo{
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      object-fit: contain;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      box-shadow: 0 14px 40px rgba(22,211,255,.12);
-    }
-
-    .brandText{display:flex; flex-direction:column; line-height:1.15;}
-    .brandText .name{font-weight: 900; letter-spacing: .2px; font-size: 14px;}
-    .brandText .sub{color: var(--muted); font-size: 12px; margin-top: 3px;}
-
-    .nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
-    .chip{
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      color: var(--muted);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      white-space: nowrap;
-      box-shadow: var(--shadowSoft);
-    }
-    .dot{
-      width:8px; height:8px; border-radius: 99px;
-      background: linear-gradient(135deg, var(--c1), var(--c3));
-      box-shadow: 0 0 18px rgba(22,211,255,.18);
-    }
-
-    /* Card */
+    .wrap{max-width: 1100px; margin:0 auto; padding: 22px 16px 70px;}
     .card{
       border:1px solid var(--border);
       background: linear-gradient(180deg, var(--glassA), var(--glassB));
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 18px;
+      padding: 16px;
       position: relative;
       overflow: hidden;
     }
@@ -129,142 +67,45 @@
                   radial-gradient(800px 280px at 85% 20%, rgba(139,92,255,.12), transparent 60%);
       pointer-events:none;
       opacity:.75;
-      mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
-      -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
+      -webkit-mask: linear-gradient(#000,#000) content-box, linear-gradient(#000,#000);
       padding:1px;
       border-radius: var(--radius);
     }
 
-    /* Hero */
-    .hero{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      margin: 18px 0 14px;
-    }
-
-    .heroMain{padding: 22px;}
-    .heroTitle{display:flex; align-items:center; gap:14px;}
-    .heroLogo{
-      width: 54px; height: 54px;
-      border-radius: 18px;
-      object-fit: contain;
-      border:1px solid var(--border);
+    /* Top */
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px;}
+    .brand{display:flex; align-items:center; gap:12px; min-width: 240px;}
+    .logo{
+      width: 40px; height: 40px; border-radius: 14px;
+      border: 1px solid var(--border);
       background: rgba(255,255,255,.03);
-      box-shadow: 0 18px 55px rgba(139,92,255,.12);
+      object-fit: contain;
+      box-shadow: 0 14px 40px rgba(22,211,255,.12);
     }
-
-    h1{margin:0; font-size: 32px; letter-spacing: -0.6px; line-height: 1.05;}
+    .brandText{display:flex; flex-direction:column; line-height:1.15;}
+    .brandText .name{font-weight: 950; letter-spacing: .2px; font-size: 13px;}
+    .brandText .sub{color: var(--muted); font-size: 12px; margin-top: 3px;}
+    .metaRight{color: var(--muted); font-size: 12px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
     .pill{
-      font-size:12px;
-      color: var(--muted);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .tagline{
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.55;
-      max-width: 70ch;
-    }
-
-    .dualBadgeRow{display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px;}
-    .badge{
-      border: 1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
       padding: 7px 10px;
       border-radius: 999px;
-      font-size: 12px;
-      color: var(--muted);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .badge svg{opacity:.9}
-
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 16px;}
-    .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 10px 12px;
-      font-weight: 850;
-      cursor: pointer;
-      color: var(--text);
-      background: rgba(255,255,255,.04);
-      transition: transform .06s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
       box-shadow: var(--shadowSoft);
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-    }
-    .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.20)}
-    .btn:active{transform: translateY(1px)}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-    .btn.primary{
-      border-color: rgba(58,123,255,.35);
-      background: linear-gradient(135deg, rgba(22,211,255,.22), rgba(139,92,255,.20));
-      position: relative;
-      overflow: hidden;
-    }
-    .btn.primary::after{
-      content:"";
-      position:absolute;
-      inset:-50%;
-      background: radial-gradient(circle at 30% 30%, rgba(22,211,255,.35), transparent 55%),
-                  radial-gradient(circle at 70% 40%, rgba(139,92,255,.28), transparent 55%);
-      opacity:.0;
-      transition: opacity .2s ease;
-      pointer-events:none;
-    }
-    .btn.primary:hover::after{opacity:.65}
-
-    .btnIcon{width:16px; height:16px; opacity:.95;}
-    .note{margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.6;}
-
-    /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-      align-items:start;
-      margin-top: 14px;
+      white-space: nowrap;
     }
 
-    .sectionHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom: 12px;
-    }
+    /* Header */
+    .header{margin-bottom: 12px;}
+    h1{margin:0; font-size: 28px; letter-spacing:-0.5px; line-height:1.05;}
+    .desc{margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; max-width: 85ch;}
 
-    .sectionHead h2{
-      margin:0;
-      font-size: 14px;
-      letter-spacing: .2px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    /* Layout */
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap: 12px; align-items:start;}
 
-    .list{
-      margin: 10px 0 0;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.65;
-    }
-
-    /* Controls panel */
-    .controls{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-bottom: 12px;
-    }
+    /* Controls */
+    .controls{display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;}
     .ctrl{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.14);
@@ -272,14 +113,7 @@
       padding:10px 12px;
       box-shadow: var(--shadowSoft);
     }
-    .ctrl .lbl{
-      font-size:12px;
-      color: var(--muted);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:8px;
-    }
+    .lbl{display:flex; justify-content:space-between; gap:10px; align-items:center; color: var(--muted); font-size: 12px; margin-bottom: 8px;}
     select, input[type="number"]{
       width:100%;
       border-radius: 12px;
@@ -288,41 +122,26 @@
       color: var(--text);
       padding:10px 10px;
       outline:none;
-      font-weight:750;
+      font-weight: 850;
     }
     select:focus, input[type="number"]:focus{
       border-color: rgba(22,211,255,.32);
       box-shadow: 0 0 0 4px rgba(22,211,255,.08);
     }
-
-    input[type="range"]{
-      width:100%;
-      accent-color: var(--c2);
-    }
-    .rangeRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .rangeVal{
-      min-width: 78px;
-      text-align:right;
+    input[type="range"]{width:100%; accent-color: var(--c2);}
+    .val{
       font-family: var(--mono);
       font-size: 12px;
-      color: rgba(238,242,255,.85);
-      opacity:.95;
+      color: rgba(238,242,255,.90);
+      min-width: 90px;
+      text-align:right;
     }
-    .hint{
-      font-size:11px;
-      color: rgba(238,242,255,.58);
-      margin-top:8px;
-      line-height:1.45;
-    }
+    .hint{margin-top:8px; font-size:11px; color: rgba(238,242,255,.58); line-height:1.45;}
 
-    /* Textarea + preview */
+    /* Text input */
     textarea{
       width:100%;
-      min-height: 260px;
+      min-height: 240px;
       resize: vertical;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.12);
@@ -339,16 +158,103 @@
       border-color: rgba(22,211,255,.32);
       box-shadow: 0 0 0 4px rgba(22,211,255,.08);
     }
-    .metaRow{
-      display:flex;
-      justify-content:space-between;
-      margin-top: 10px;
-      color: var(--muted);
+    .row{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; color: var(--muted); font-size: 12px; margin-top:10px;}
+    .mono{font-family: var(--mono);}
+
+    /* Buttons */
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px;}
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-weight: 950;
+      cursor: pointer;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+      box-shadow: var(--shadowSoft);
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.20)}
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .btn.primary{
+      border-color: rgba(58,123,255,.35);
+      background: linear-gradient(135deg, rgba(22,211,255,.22), rgba(139,92,255,.20));
+    }
+    .btnIcon{width:16px;height:16px;opacity:.95;}
+
+    /* Results */
+    .sectionTitle{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
+    .sectionTitle h2{margin:0; font-size: 13px; letter-spacing:.2px;}
+    .small{color: var(--muted); font-size: 12px;}
+
+    .verdict{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      border:1px solid rgba(255,255,255,.12);
       font-size: 12px;
-      gap: 12px;
-      flex-wrap:wrap;
+      font-weight: 950;
+      letter-spacing: .2px;
+      box-shadow: var(--shadowSoft);
+      background: rgba(0,0,0,.14);
+      white-space: nowrap;
+    }
+    .dot{width:9px;height:9px;border-radius:99px}
+    .allow .dot{background: rgba(45,227,140,.95); box-shadow: 0 0 18px rgba(45,227,140,.18);}
+    .warnV .dot{background: rgba(255,204,77,.95); box-shadow: 0 0 18px rgba(255,204,77,.18);}
+    .block .dot{background: rgba(255,77,77,.95); box-shadow: 0 0 18px rgba(255,77,77,.18);}
+
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      transition: width .35s ease;
+      background: linear-gradient(90deg, rgba(45,227,140,.85), rgba(45,227,140,.55));
+      box-shadow: 0 0 18px rgba(45,227,140,.14);
     }
 
+    .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top: 10px;}
+    .kpi{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 10px 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .kpi .k{color: var(--muted); font-size: 12px;}
+    .kpi .v{margin-top:4px; font-size: 16px; font-weight: 950; letter-spacing: -0.2px;}
+
+    /* Reasons */
+    .reasons{
+      margin-top: 10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: var(--shadowSoft);
+    }
+    .reasonsHead{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;}
+    .reasonsHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
+    ul{margin:0; padding-left: 18px;}
+    li{color: var(--muted); font-size: 12px; line-height: 1.55; margin: 4px 0;}
+    .code{font-family: var(--mono); color: rgba(238,242,255,.88);}
+
+    /* PII preview */
     .preview{
       margin-top: 12px;
       border:1px solid rgba(255,255,255,.10);
@@ -357,21 +263,8 @@
       padding: 12px;
       box-shadow: var(--shadowSoft);
     }
-    .previewHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .previewHead .t{
-      font-size:12px;
-      color: var(--muted);
-      font-weight:850;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
+    .previewHead{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
+    .previewHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
     .previewBody{
       font-family: var(--mono);
       font-size: 12px;
@@ -388,131 +281,58 @@
       border-radius: 8px;
     }
 
-    /* Results */
-    .results{display:grid; gap:14px;}
-
-    .bar{
-      height: 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      overflow: hidden;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
-    }
-
-    .fill{
-      height:100%;
-      width:0%;
-      transition: width .35s ease, filter .2s ease;
-      background: linear-gradient(90deg, rgba(45,227,140,.85), rgba(45,227,140,.55));
-      box-shadow: 0 0 18px rgba(45,227,140,.14);
-    }
-
-    .kpis{display:flex; gap:12px; flex-wrap:wrap; margin-top: 12px;}
-    .kpi{
-      flex:1;
-      min-width: 170px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding: 10px 12px;
-      box-shadow: var(--shadowSoft);
-    }
-    .kpi .label{color: var(--muted); font-size: 12px;}
-    .kpi .value{margin-top: 4px; font-size: 18px; font-weight: 950; letter-spacing: -0.2px;}
-
-    /* Verdict chips */
-    .verdictRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-top:-2px;
-      margin-bottom:10px;
-    }
-    .verdict{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border-radius: 999px;
-      padding: 7px 10px;
-      border:1px solid rgba(255,255,255,.12);
-      font-size: 12px;
-      font-weight: 950;
-      letter-spacing: .2px;
-      box-shadow: var(--shadowSoft);
+    /* Exports */
+    .exports{margin-top: 12px; display:grid; gap:10px;}
+    .codeWrap{
+      border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.14);
-    }
-    .vDot{width:9px;height:9px;border-radius:99px}
-    .allow .vDot{background: rgba(45,227,140,.95); box-shadow: 0 0 18px rgba(45,227,140,.18);}
-    .warnV .vDot{background: rgba(255,204,77,.95); box-shadow: 0 0 18px rgba(255,204,77,.18);}
-    .block .vDot{background: rgba(255,77,77,.95); box-shadow: 0 0 18px rgba(255,77,77,.18);}
-
-    .miniMeta{
-      font-size: 12px;
-      color: var(--muted);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      white-space:nowrap;
-    }
-
-    /* CTA boxes */
-    .ctaBox{
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.08));
       padding: 12px;
-      margin-top: 12px;
-      position: relative;
-      overflow:hidden;
+      box-shadow: var(--shadowSoft);
     }
-    .ctaBox::after{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(22,211,255,.12), transparent 55%),
-        radial-gradient(circle at 70% 40%, rgba(139,92,255,.10), transparent 55%);
-      opacity:.65;
-      pointer-events:none;
-    }
-    .ctaBox .t{
-      margin:0 0 6px;
-      font-weight: 950;
-      font-size: 13px;
-      letter-spacing:.1px;
-      position: relative;
-      z-index: 1;
-    }
-    .ctaBox .p{
+    .codeHead{display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:10px;}
+    .codeHead .t{font-size:12px; color: var(--muted); font-weight: 950;}
+    pre{
       margin:0;
-      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--mono);
       font-size: 12px;
-      line-height: 1.55;
-      position: relative;
-      z-index: 1;
-    }
-    .ctaLink{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-top: 9px;
-      color: rgba(122,162,255,1);
-      font-weight: 950;
-      font-size: 12px;
-      position: relative;
-      z-index: 1;
+      line-height: 1.6;
+      color: rgba(238,242,255,.86);
     }
 
-    /* Scan animation */
-    .scanning .fill{
-      filter: saturate(1.15) brightness(1.05);
-      animation: pulse 1.05s ease-in-out infinite;
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 999px;
+      padding: 10px 12px;
+      color: rgba(238,242,255,.90);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .1px;
+      display:none;
+      align-items:center;
+      gap:10px;
+      box-shadow: var(--shadow);
+      z-index: 9999;
     }
-    .scanning .btn.primary{
-      animation: btnPulse 1.05s ease-in-out infinite;
+    .toast .tDot{
+      width:10px;height:10px;border-radius:99px;
+      background: linear-gradient(135deg, var(--c1), var(--c3));
+      box-shadow: 0 0 22px rgba(22,211,255,.18);
     }
+
+    /* Scan animation (minimal) */
+    .scanning .fill{animation: pulse 1.05s ease-in-out infinite;}
+    .scanning .btn.primary{animation: btnPulse 1.05s ease-in-out infinite;}
     @keyframes pulse{0%{opacity:.70}50%{opacity:1}100%{opacity:.70}}
     @keyframes btnPulse{
       0%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
@@ -520,85 +340,95 @@
       100%{box-shadow: var(--shadowSoft), 0 0 0 rgba(22,211,255,0)}
     }
 
-    .footer{
-      text-align:center;
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .footer{margin-top: 14px; text-align:center; color: var(--muted); font-size: 12px;}
 
     @media (max-width: 920px){
-      .hero{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr}
-      .nav{justify-content:flex-start}
-      .controls{grid-template-columns:1fr}
-      h1{font-size:30px}
-      .heroLogo{width:50px;height:50px}
+      .grid{grid-template-columns: 1fr;}
+      .controls{grid-template-columns: 1fr;}
+      h1{font-size:26px}
+      .metaRight{justify-content:flex-start}
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <!-- TOPBAR -->
     <div class="topbar">
       <div class="brand">
-        <img class="logo" src="Logo.png" alt="EmotionGate logo"
-             onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';" />
-        <div id="logoFallback" class="logo" style="display:none; background:linear-gradient(135deg, var(--c1), var(--c3));"></div>
-
+        <img class="logo" src="Logo.png" alt="Logo" onerror="this.style.display='none';" />
         <div class="brandText">
-          <div class="name">EmotionGate × AnchorGateway</div>
-          <div class="sub">Dual-Scanner • Day 2 UI (Models + Caps)</div>
+          <div class="name">Dual-Scanner</div>
+          <div class="sub">Safety (EmotionGate) + Cost (AnchorGateway)</div>
         </div>
       </div>
-
-      <div class="nav">
-        <a class="chip" href="https://emotiongate.com" target="_blank" rel="noopener"><span class="dot"></span>EmotionGate</a>
-        <a class="chip" href="https://anchorgateway.com" target="_blank" rel="noopener"><span class="dot"></span>AnchorGateway</a>
-        <span class="chip"><span class="dot"></span>No login</span>
-        <span class="chip"><span class="dot"></span>MVP tool</span>
+      <div class="metaRight">
+        <span class="pill" id="pricingUpdated">Pricing: local</span>
+        <span class="pill" id="buildStamp">FINAL</span>
       </div>
     </div>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="card heroMain" id="scanRoot">
-        <div class="heroTitle">
-          <img class="heroLogo" src="Logo.png" alt="EmotionGate logo" onerror="this.style.display='none';" />
-          <div>
-            <h1>Dual-Scanner</h1>
-            <div class="pill" style="margin-top:8px;">
-              Day 2 UI: <b>Model selector</b> + <b>Cost cap</b> + <b>Safety threshold</b>
+    <div class="card header">
+      <h1>Safety + Cost preflight</h1>
+      <p class="desc">
+        Paste a prompt or an LLM response. This page returns: <b>ALLOW/BLOCK</b>, reason codes, and exportable JSON for audit/policy config.
+      </p>
+    </div>
+
+    <section class="grid">
+      <!-- LEFT: INPUT -->
+      <div class="card">
+        <div class="sectionTitle">
+          <h2>Input & Controls</h2>
+          <span class="small mono" id="stamp">—</span>
+        </div>
+
+        <div class="controls">
+          <div class="ctrl">
+            <div class="lbl"><span>Model</span><span class="val" id="modelHint">—</span></div>
+            <select id="modelSelect"></select>
+            <div class="hint">“Custom” lets you edit $/1k tokens.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl"><span>Max cost cap (USD)</span><span class="val" id="capUsdVal">$0.010</span></div>
+            <input id="capUsd" type="range" min="0" max="50" value="10" />
+            <div class="hint">Range: $0.000–$0.050 per request.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl"><span>Output tokens (estimate)</span><span class="val" id="outTokVal">256</span></div>
+            <input id="outTok" type="range" min="0" max="4096" value="256" step="16" />
+            <div class="hint">Cost includes both input + output tokens.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="lbl"><span>Safety threshold</span><span class="val" id="thrVal">60</span></div>
+            <input id="thr" type="range" min="0" max="100" value="60" />
+            <div class="hint">BLOCK if Safety Score is below threshold.</div>
+          </div>
+
+          <div class="ctrl" id="customPricingCtrl" style="display:none; grid-column: 1 / -1;">
+            <div class="lbl"><span>Custom pricing ($ / 1k)</span><span class="small">input + output</span></div>
+            <div class="controls" style="margin:0; grid-template-columns: 1fr 1fr;">
+              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
+                <div class="lbl"><span>Input $/1k</span><span class="val" id="inPriceShow">0.0030</span></div>
+                <input id="inPrice" type="number" min="0" step="0.0001" value="0.0030" />
+              </div>
+              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
+                <div class="lbl"><span>Output $/1k</span><span class="val" id="outPriceShow">0.0060</span></div>
+                <input id="outPrice" type="number" min="0" step="0.0001" value="0.0060" />
+              </div>
             </div>
+            <div class="hint">Replace local placeholder pricing later.</div>
           </div>
         </div>
 
-        <p class="tagline">
-          Tämä on “policy preview” -tasoinen demo: voit säätää kynnysarvoja ja nähdä
-          tulevan gatewayn logiikan: <b>ALLOW</b> vs <b>BLOCK</b> — ennen kuin kutsut LLM:ää.
-        </p>
+        <textarea id="text" placeholder="Paste text here..."></textarea>
 
-        <div class="dualBadgeRow">
-          <span class="badge">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3l8 4v6c0 5-3.4 9-8 10-4.6-1-8-5-8-10V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-            Safety policy (EmotionGate)
-          </span>
-          <span class="badge">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 6c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3z" stroke="currentColor" stroke-width="2"/>
-              <path d="M4 3v6c0 1.7 3.6 3 8 3s8-1.3 8-3V3" stroke="currentColor" stroke-width="2" opacity=".9"/>
-            </svg>
-            Budget policy (AnchorGateway)
-          </span>
-          <span class="badge">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-            Instant verdict
-          </span>
+        <div class="row">
+          <span id="chars">0 chars</span>
+          <span id="words">0 words</span>
+          <span class="mono" id="inTok">Input tokens: —</span>
         </div>
 
         <div class="actions">
@@ -618,7 +448,7 @@
               <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2"/>
               <path d="M7 8h10M7 12h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
             </svg>
-            Load example
+            Example
           </button>
 
           <button class="btn" id="clearBtn">
@@ -631,370 +461,217 @@
           </button>
         </div>
 
-        <div class="note">
-          Huom: hinnat ovat <b>demo-pricing</b>. Kun haluat “oikeat”, tämä UI pysyy samana — vain pricing-taulukko vaihtuu.
-        </div>
-      </div>
-
-      <!-- SIDE CARD -->
-      <div class="card">
-        <div class="sectionHead">
-          <h2>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M12 22a10 10 0 100-20 10 10 0 000 20z" stroke="currentColor" stroke-width="2"/>
-              <path d="M14.5 9.5l-1.2 5-5 1.2 1.2-5 5-1.2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-            Day 2: “Policy preview”
-          </h2>
-          <span class="pill">no backend</span>
-        </div>
-
-        <ul class="list" style="margin-top:0">
-          <li><b>Model</b> → input/output $/1k</li>
-          <li><b>Cap</b> → BLOCK jos ylittää</li>
-          <li><b>Safety threshold</b> → BLOCK jos liian toxic</li>
-          <li><b>PII highlight</b> → näyttää riskit heti</li>
-        </ul>
-
-        <div class="ctaBox">
-          <p class="t">AnchorGateway next</p>
-          <p class="p">Näytä “cap enforced” kuten gateway tekisi: deny + reason code.</p>
-        </div>
-
-        <div class="ctaBox" style="margin-top:12px;">
-          <p class="t">EmotionGate next</p>
-          <p class="p">Korvaa heuristiikka moderointimallilla + policy allow/deny -logiikalla.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MAIN GRID -->
-    <section class="grid">
-      <!-- INPUT -->
-      <div class="card">
-        <div class="sectionHead">
-          <h2>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M9 4h6l1 2h3v16H5V6h3l1-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              <path d="M9 4v2h6V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-            </svg>
-            Input + Controls
-          </h2>
-          <span class="pill">Day 2 UI</span>
-        </div>
-
-        <div class="controls">
-          <div class="ctrl">
-            <div class="lbl">
-              <span>Model</span>
-              <span id="pricingHint" class="miniMeta">demo pricing</span>
-            </div>
-            <select id="modelSelect"></select>
-            <div class="hint">“Custom” antaa muuttaa input/output $/1k.</div>
-          </div>
-
-          <div class="ctrl">
-            <div class="lbl">
-              <span>Max cost cap (USD)</span>
-              <span class="rangeVal" id="capUsdVal">$0.010</span>
-            </div>
-            <div class="rangeRow">
-              <input id="capUsd" type="range" min="0" max="50" value="10" />
-            </div>
-            <div class="hint">0–$0.050 per request (demo). Gateway enforceaisi tämän.</div>
-          </div>
-
-          <div class="ctrl">
-            <div class="lbl">
-              <span>Output tokens (estimate)</span>
-              <span class="rangeVal" id="outTokVal">256</span>
-            </div>
-            <div class="rangeRow">
-              <input id="outTok" type="range" min="0" max="2048" value="256" step="16" />
-            </div>
-            <div class="hint">Koska kustannus riippuu myös vastauksen pituudesta.</div>
-          </div>
-
-          <div class="ctrl">
-            <div class="lbl">
-              <span>Safety threshold</span>
-              <span class="rangeVal" id="safetyThrVal">60</span>
-            </div>
-            <div class="rangeRow">
-              <input id="safetyThr" type="range" min="0" max="100" value="60" />
-            </div>
-            <div class="hint">BLOCK jos Safety Score &lt; threshold.</div>
-          </div>
-
-          <div class="ctrl" id="customPricingCtrl" style="display:none; grid-column: 1 / -1;">
-            <div class="lbl">
-              <span>Custom pricing ($ / 1k tokens)</span>
-              <span class="miniMeta">input + output</span>
-            </div>
-            <div class="controls" style="margin:0; grid-template-columns: 1fr 1fr;">
-              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
-                <div class="lbl"><span>Input $/1k</span><span class="miniMeta" id="inPriceShow">0.0030</span></div>
-                <input id="inPrice" type="number" min="0" step="0.0001" value="0.0030" />
-              </div>
-              <div class="ctrl" style="margin:0; box-shadow:none; background:rgba(255,255,255,.02);">
-                <div class="lbl"><span>Output $/1k</span><span class="miniMeta" id="outPriceShow">0.0060</span></div>
-                <input id="outPrice" type="number" min="0" step="0.0001" value="0.0060" />
-              </div>
-            </div>
-            <div class="hint">Voit liimata tähän myöhemmin “oikeat” hinnat ilman UI-muutoksia.</div>
-          </div>
-        </div>
-
-        <textarea id="textInput" placeholder="Liitä tähän prompt tai LLM-vastaus..."></textarea>
-
-        <div class="metaRow">
-          <div id="charCount">0 chars</div>
-          <div id="wordCount">0 words</div>
-          <div class="miniMeta" id="inTokMeta">Input tokens: —</div>
-        </div>
-
         <div class="preview">
           <div class="previewHead">
-            <div class="t">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M4 12s3-7 8-7 8 7 8 7-3 7-8 7-8-7-8-7z" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2" opacity=".9"/>
-              </svg>
-              PII Highlight Preview
-            </div>
-            <div class="miniMeta">emails • phones • IPs</div>
+            <div class="t">PII Highlight Preview</div>
+            <div class="small">email • phone • IP</div>
           </div>
           <div id="piiPreview" class="previewBody">—</div>
         </div>
       </div>
 
-      <!-- RESULTS -->
-      <div class="card results" id="resultsCard">
+      <!-- RIGHT: RESULTS + EXPORT -->
+      <div class="card" id="scanRoot">
+        <div class="sectionTitle">
+          <h2>Enforce Preview</h2>
+          <span id="overallVerdict" class="verdict warnV"><span class="dot"></span><span>—</span></span>
+        </div>
+
         <!-- SAFETY -->
-        <div>
-          <div class="sectionHead">
-            <h2>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 3l8 4v6c0 5-3.4 9-8 10-4.6-1-8-5-8-10V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-              </svg>
-              Safety Score
-            </h2>
-            <span class="pill">Powered by EmotionGate</span>
+        <div style="margin-bottom:12px;">
+          <div class="sectionTitle" style="margin-bottom:8px;">
+            <span class="small"><b>Safety</b> (EmotionGate)</span>
+            <span class="small">threshold: <span class="mono" id="thrShow">60</span></span>
           </div>
-
-          <div class="verdictRow">
-            <div id="safetyVerdict" class="verdict warnV">
-              <span class="vDot"></span><span>—</span>
-            </div>
-            <div class="miniMeta">threshold: <span id="thrShow">60</span></div>
-          </div>
-
-          <div class="bar" aria-label="Safety meter">
-            <div id="safetyFill" class="fill"></div>
-          </div>
-
+          <div class="bar"><div id="safetyFill" class="fill"></div></div>
           <div class="kpis">
             <div class="kpi">
-              <div class="label">Tone</div>
-              <div class="value" id="safetyLabel">—</div>
+              <div class="k">Safety Score</div>
+              <div class="v" id="safetyScore">—</div>
             </div>
             <div class="kpi">
-              <div class="label">PII Detected</div>
-              <div class="value" id="piiLabel">—</div>
+              <div class="k">PII detected</div>
+              <div class="v" id="piiYesNo">—</div>
             </div>
-          </div>
-
-          <ul class="list" id="safetyFlags"></ul>
-
-          <div class="ctaBox">
-            <p class="t">Want to block unsafe prompts automatically?</p>
-            <p class="p">Policy-gate: deny + reason code + audit trail (later).</p>
-            <a class="ctaLink" href="https://emotiongate.com" target="_blank" rel="noopener">
-              Join EmotionGate waitlist →
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </a>
           </div>
         </div>
 
         <!-- COST -->
-        <div>
-          <div class="sectionHead">
-            <h2>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 6c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3z" stroke="currentColor" stroke-width="2"/>
-                <path d="M4 3v6c0 1.7 3.6 3 8 3s8-1.3 8-3V3" stroke="currentColor" stroke-width="2" opacity=".9"/>
-              </svg>
-              Cost Estimate
-            </h2>
-            <span class="pill">Powered by AnchorGateway</span>
+        <div style="margin-bottom:12px;">
+          <div class="sectionTitle" style="margin-bottom:8px;">
+            <span class="small"><b>Cost</b> (AnchorGateway)</span>
+            <span class="small">cap: <span class="mono" id="capShow">$0.010</span></span>
           </div>
-
-          <div class="verdictRow">
-            <div id="costVerdict" class="verdict warnV">
-              <span class="vDot"></span><span>—</span>
-            </div>
-            <div class="miniMeta">cap: <span id="capShow">$0.010</span></div>
-          </div>
-
-          <div class="bar" aria-label="Cost meter">
-            <div id="costFill" class="fill"></div>
-          </div>
-
+          <div class="bar"><div id="costFill" class="fill"></div></div>
           <div class="kpis">
             <div class="kpi">
-              <div class="label">Input Tokens</div>
-              <div class="value" id="tokenInLabel">—</div>
+              <div class="k">Tokens (in / out)</div>
+              <div class="v" id="tokPair">—</div>
             </div>
             <div class="kpi">
-              <div class="label">Output Tokens</div>
-              <div class="value" id="tokenOutLabel">—</div>
+              <div class="k">Estimated cost</div>
+              <div class="v" id="costUsd">—</div>
             </div>
-            <div class="kpi">
-              <div class="label">Estimated Total Cost</div>
-              <div class="value" id="costLabel">—</div>
-            </div>
-          </div>
-
-          <ul class="list" id="costFlags"></ul>
-
-          <div class="ctaBox">
-            <p class="t">Want to cap spending on prompts?</p>
-            <p class="p">Gateway enforceaa capin: deny + reason code + audit (later).</p>
-            <a class="ctaLink" href="https://anchorgateway.com" target="_blank" rel="noopener">
-              Join AnchorGateway waitlist →
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </a>
-          </div>
-
-          <div class="note">
-            Demo-pricing: vaihda hinnat myöhemmin. UI pysyy samana.
           </div>
         </div>
+
+        <div class="reasons">
+          <div class="reasonsHead">
+            <div class="t">Reason codes</div>
+            <div class="small" id="reasonsCount">0</div>
+          </div>
+          <ul id="reasonsList">
+            <li class="small">—</li>
+          </ul>
+        </div>
+
+        <div class="exports">
+          <div class="codeWrap">
+            <div class="codeHead">
+                          <div class="codeHead">
+              <div class="t">Report JSON</div>
+              <button class="btn" id="copyReportBtn">
+                <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 9h10v12H9z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1" stroke="currentColor" stroke-width="2" opacity=".9"/>
+                </svg>
+                Copy
+              </button>
+            </div>
+            <pre id="reportJson">—</pre>
+          </div>
+
+          <div class="codeWrap">
+            <div class="codeHead">
+              <div class="t">Policy JSON</div>
+              <button class="btn" id="copyPolicyBtn">
+                <svg class="btnIcon" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 9h10v12H9z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1" stroke="currentColor" stroke-width="2" opacity=".9"/>
+                </svg>
+                Copy
+              </button>
+            </div>
+            <pre id="policyJson">—</pre>
+          </div>
+        </div>
+
+        <div class="footer">© <span id="year"></span> Dual-Scanner</div>
       </div>
     </section>
-
-    <div class="footer">
-      © <span id="year"></span> EmotionGate × AnchorGateway — “Measure first. Run second.”
-    </div>
   </div>
+
+  <div class="toast" id="toast"><span class="tDot"></span><span id="toastMsg">Copied</span></div>
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+    const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
 
-    // --- Demo model pricing (placeholders) ---
-    // (You can replace these later without changing UI.)
+    // --- Local placeholder pricing (swap later without UI changes)
+    const PRICING_LAST_UPDATED = "2026-01-03 (local placeholder)";
     const MODELS = [
-      { id: "demo-mini", name: "Demo Mini (cheap)", inPer1k: 0.0010, outPer1k: 0.0020 },
-      { id: "demo-standard", name: "Demo Standard", inPer1k: 0.0030, outPer1k: 0.0060 },
-      { id: "demo-pro", name: "Demo Pro (expensive)", inPer1k: 0.0100, outPer1k: 0.0300 },
-      { id: "custom", name: "Custom (edit $/1k)", inPer1k: 0.0030, outPer1k: 0.0060 }
+      { id:"demo-mini", name:"Demo Mini", inPer1k:0.0010, outPer1k:0.0020 },
+      { id:"demo-standard", name:"Demo Standard", inPer1k:0.0030, outPer1k:0.0060 },
+      { id:"demo-pro", name:"Demo Pro", inPer1k:0.0100, outPer1k:0.0300 },
+      { id:"custom", name:"Custom", inPer1k:0.0030, outPer1k:0.0060 }
     ];
 
-    function countWords(text){
-      const t = text.trim();
-      if(!t) return 0;
-      return t.split(/\s+/).filter(Boolean).length;
-    }
+    // Rough token estimator for UI wedge
+    const estimateTokens = (text) => Math.max(0, Math.round((text.trim().length)/4));
+    const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0);
 
-    // Rough token estimator: ~4 chars/token (varies, good enough for UI wedge)
-    function estimateTokens(text) {
-      const chars = text.trim().length;
-      return Math.max(0, Math.round(chars / 4));
-    }
-
-    function dollars(n) {
+    const dollars = (n) => {
       const s = n.toFixed(6);
       return "$" + s.replace(/0+$/,"").replace(/\.$/,"");
+    };
+    const nowISO = () => new Date().toISOString();
+
+    function toast(msg){
+      $("toastMsg").textContent = msg;
+      $("toast").style.display = "flex";
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=> $("toast").style.display="none", 1400);
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        toast("Copied ✓");
+      } catch(e){
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        toast("Copied ✓");
+      }
     }
 
     function getSelectedModel(){
       const id = $("modelSelect").value;
-      const m = MODELS.find(x => x.id === id) || MODELS[0];
-      if(m.id !== "custom") return m;
-
-      // custom uses input boxes
-      const inP = parseFloat($("inPrice").value || "0");
-      const outP = parseFloat($("outPrice").value || "0");
-      return { id: "custom", name: "Custom", inPer1k: Math.max(0,inP), outPer1k: Math.max(0,outP) };
+      const base = MODELS.find(m => m.id === id) || MODELS[0];
+      if(id !== "custom") return base;
+      const inP = Math.max(0, parseFloat($("inPrice").value || "0"));
+      const outP = Math.max(0, parseFloat($("outPrice").value || "0"));
+      return { id:"custom", name:"Custom", inPer1k: inP, outPer1k: outP };
     }
 
-    function estimateCostUSD(inTokens, outTokens, model){
-      return (inTokens / 1000) * model.inPer1k + (outTokens / 1000) * model.outPer1k;
+    function estimateCostUSD(inTok, outTok, model){
+      return (inTok/1000)*model.inPer1k + (outTok/1000)*model.outPer1k;
     }
 
-    // PII detection + highlight (emails, phones, IPs)
-    function detectPII(text) {
-      const email = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-      const phone = /(\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4}/g;
-      const ip = /\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b/g;
+    // --- PII detection + highlight
+    const RE_EMAIL = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const RE_PHONE = /(\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4}/g;
+    const RE_IP = /\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b/g;
 
-      const flags = [];
-      if (email.test(text)) flags.push("Email address detected");
-      if (phone.test(text)) flags.push("Phone-like number detected");
-      if (ip.test(text)) flags.push("IP address detected");
-      return flags;
+    function detectPII(text){
+      const f = [];
+      if(RE_EMAIL.test(text)) f.push({ code:"EG_PII_EMAIL", detail:"Email address detected" });
+      if(RE_PHONE.test(text)) f.push({ code:"EG_PII_PHONE", detail:"Phone-like number detected" });
+      if(RE_IP.test(text)) f.push({ code:"EG_PII_IP", detail:"IP address detected" });
+      return f;
     }
 
     function escapeHtml(s){
-      return s.replace(/[&<>"']/g, (c) => ({
+      return s.replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
       }[c]));
     }
 
     function highlightPII(text){
       if(!text.trim()) return "—";
-      // We mark matches by replacing with placeholders then injecting <mark>.
-      // Keep it simple: run three regex passes on escaped string.
       let safe = escapeHtml(text);
       const patterns = [
         /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
         /((\+?\d{1,3}[\s-]?)?(\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4})/g,
         /(\b(?:(?:2[0-5]{2}|1?\d{1,2})\.){3}(?:2[0-5]{2}|1?\d{1,2})\b)/g
       ];
-      for(const re of patterns){
-        safe = safe.replace(re, "<mark>$1</mark>");
-      }
+      for(const re of patterns) safe = safe.replace(re, "<mark>$1</mark>");
       return safe;
     }
 
-    // Lightweight toxicity heuristic (demo)
-    function heuristicToxicity(text) {
+    // --- Safety heuristic (placeholder)
+    function heuristicToxicity(text){
       const lower = text.toLowerCase();
-      const badWords = [
-        "kill","hate","idiot","stupid","moron","shut up","die","nazi",
-        "rape","kys","suicide","bomb","dox","address"
-      ];
+      const badWords = ["kill","hate","idiot","stupid","moron","shut up","die","nazi","rape","kys","suicide","bomb","dox","address"];
       let score = 0;
-      for (const w of badWords) if (lower.includes(w)) score += 12;
-
+      for(const w of badWords) if(lower.includes(w)) score += 12;
       const caps = (text.match(/[A-ZÄÖÅ]{2,}/g) || []).length;
-      score += Math.min(12, caps * 2);
-
+      score += Math.min(12, caps*2);
       const bangs = (text.match(/!/g) || []).length;
       score += Math.min(10, bangs);
-
       return clamp(score, 0, 100);
     }
 
-    function labelForToxicity(score) {
-      if (score >= 70) return "Angry / Toxic";
-      if (score >= 40) return "Risky / Spiky";
-      return "Helpful / Neutral";
-    }
-
-    function setBar(fillEl, value0to100) {
+    // --- Bars + verdict UI
+    function setBar(fillEl, value0to100){
       fillEl.style.width = value0to100 + "%";
       let colorA = "rgba(45,227,140,.85)";
       let colorB = "rgba(45,227,140,.55)";
-      if (value0to100 < 35) { colorA = "rgba(255,77,77,.85)"; colorB = "rgba(255,77,77,.55)"; }
-      else if (value0to100 < 65) { colorA = "rgba(255,204,77,.85)"; colorB = "rgba(255,204,77,.55)"; }
+      if(value0to100 < 35){ colorA="rgba(255,77,77,.85)"; colorB="rgba(255,77,77,.55)"; }
+      else if(value0to100 < 65){ colorA="rgba(255,204,77,.85)"; colorB="rgba(255,204,77,.55)"; }
       fillEl.style.background = `linear-gradient(90deg, ${colorA}, ${colorB})`;
       fillEl.style.boxShadow = `0 0 18px ${colorA}`;
     }
@@ -1005,40 +682,102 @@
       el.querySelector("span:last-child").textContent = text;
     }
 
-    function setScanning(isOn){
-      const root = document.getElementById("scanRoot");
-      if(isOn) root.classList.add("scanning");
+    function setScanning(on){
+      const root = $("scanRoot");
+      if(on) root.classList.add("scanning");
       else root.classList.remove("scanning");
     }
 
-    function capUsdFromSlider(){
-      // slider 0..50 -> $0.000..$0.050
-      const v = parseInt($("capUsd").value || "0", 10);
-      return v / 1000;
-    }
+    function capFromSlider(){ return (parseInt($("capUsd").value || "0", 10))/1000; } // 0..0.050
 
-    function refreshControlsUI(){
-      const cap = capUsdFromSlider();
+    function refreshUI(){
+      const cap = capFromSlider();
+      const outTok = parseInt($("outTok").value || "0", 10);
+      const thr = parseInt($("thr").value || "60", 10);
+
       $("capUsdVal").textContent = dollars(cap);
       $("capShow").textContent = dollars(cap);
-
-      const outTok = parseInt($("outTok").value || "0", 10);
       $("outTokVal").textContent = String(outTok);
-
-      const thr = parseInt($("safetyThr").value || "60", 10);
-      $("safetyThrVal").textContent = String(thr);
+      $("thrVal").textContent = String(thr);
       $("thrShow").textContent = String(thr);
 
-      const modelId = $("modelSelect").value;
-      $("customPricingCtrl").style.display = (modelId === "custom") ? "block" : "none";
+      const model = getSelectedModel();
+      $("modelHint").textContent = model.id === "custom" ? "custom" : `${model.inPer1k.toFixed(4)}/${model.outPer1k.toFixed(4)}`;
+      $("customPricingCtrl").style.display = ($("modelSelect").value === "custom") ? "block" : "none";
 
-      $("inPriceShow").textContent = (parseFloat($("inPrice").value||"0")).toFixed(4);
-      $("outPriceShow").textContent = (parseFloat($("outPrice").value||"0")).toFixed(4);
+      $("inPriceShow").textContent = (parseFloat($("inPrice").value || "0")).toFixed(4);
+      $("outPriceShow").textContent = (parseFloat($("outPrice").value || "0")).toFixed(4);
+
+      $("pricingUpdated").textContent = "Pricing: local";
+      $("stamp").textContent = PRICING_LAST_UPDATED;
+      $("buildStamp").textContent = "FINAL";
+    }
+
+    // --- Reason codes
+    function buildReasonCodes({ safetyScore, thr, tox, pii, cost, cap, totalTokens }){
+      const r = [];
+      if(safetyScore < thr) r.push({ system:"EmotionGate", code:"EG_SAFETY_BELOW_THRESHOLD", detail:`${Math.round(safetyScore)} < ${thr}` });
+      if(tox >= 70) r.push({ system:"EmotionGate", code:"EG_TOXICITY_HIGH", detail:`toxicity ${tox}/100` });
+      else if(tox >= 40) r.push({ system:"EmotionGate", code:"EG_TOXICITY_MEDIUM", detail:`toxicity ${tox}/100` });
+
+      for(const p of pii) r.push({ system:"EmotionGate", code:p.code, detail:p.detail });
+
+      if(cost > cap) r.push({ system:"AnchorGateway", code:"AG_CAP_EXCEEDED", detail:`${dollars(cost)} > ${dollars(cap)}` });
+      if(totalTokens > 3000) r.push({ system:"AnchorGateway", code:"AG_TOKENS_HIGH", detail:`tokens ${totalTokens}` });
+
+      return r;
+    }
+
+    function exportPolicy({ thr, cap, model, outTok }){
+      return {
+        v: 1,
+        generated_at: nowISO(),
+        pricing_last_updated: PRICING_LAST_UPDATED,
+        emotiongate_policy: {
+          v: 1,
+          mode: "deny_below_threshold",
+          rules: [
+            { id:"EG_RULE_SAFETY_THRESHOLD", type:"safety_score_min", min: thr },
+            { id:"EG_RULE_PII", type:"deny_pii", detectors:["email","phone","ip"] }
+          ]
+        },
+        anchorgateway_policy: {
+          v: 1,
+          mode: "deny_over_cap",
+          model: {
+            id: model.id,
+            name: model.name,
+            pricing: { input_per_1k: model.inPer1k, output_per_1k: model.outPer1k }
+          },
+          limits: { max_cost_usd: cap, expected_output_tokens: outTok }
+        }
+      };
+    }
+
+    // --- State
+    let LAST_REPORT = null;
+    let LAST_POLICY = null;
+
+    function resetOutputs(){
+      $("safetyScore").textContent = "—";
+      $("piiYesNo").textContent = "—";
+      $("tokPair").textContent = "—";
+      $("costUsd").textContent = "—";
+      $("reasonsCount").textContent = "0";
+      $("reasonsList").innerHTML = `<li class="small">—</li>`;
+      $("reportJson").textContent = "—";
+      $("policyJson").textContent = "—";
+      $("piiPreview").textContent = "—";
+      $("safetyFill").style.width = "0%";
+      $("costFill").style.width = "0%";
+      setVerdict($("overallVerdict"), "warnV", "—");
+      LAST_REPORT = null;
+      LAST_POLICY = null;
     }
 
     async function analyze(){
-      const text = $("textInput").value || "";
-      if (!text.trim()) { alert("Liitä teksti ensin."); return; }
+      const text = $("text").value || "";
+      if(!text.trim()) return alert("Paste some text first.");
 
       $("analyzeBtn").disabled = true;
       $("analyzeText").textContent = "Analyzing…";
@@ -1046,74 +785,88 @@
 
       try{
         const model = getSelectedModel();
+        const cap = capFromSlider();
         const outTok = parseInt($("outTok").value || "0", 10);
-        const cap = capUsdFromSlider();
-        const thr = parseInt($("safetyThr").value || "60", 10);
+        const thr = parseInt($("thr").value || "60", 10);
 
         const inTok = estimateTokens(text);
         const tox = heuristicToxicity(text);
-        const piiFlags = detectPII(text);
-
         const safetyScore = clamp(100 - tox, 0, 100);
-        const toneLabel = labelForToxicity(tox);
+        const pii = detectPII(text);
 
         const cost = estimateCostUSD(inTok, outTok, model);
+        const totalTokens = inTok + outTok;
 
-        // Update meters
+        // Overall verdict: block if any block condition triggers
+        const safetyAllow = (safetyScore >= thr) && (pii.length === 0); // strict by default
+        const costAllow = (cost <= cap);
+        const overall = (safetyAllow && costAllow) ? "ALLOW" : "BLOCK";
+
+        // UI meters
         setBar($("safetyFill"), safetyScore);
 
-        // Cost meter: show “cheaper is greener” by mapping raw usage then inverting
-        const usageRaw = clamp(((inTok + outTok) / 4000) * 100, 0, 100);
-        const usageInv = clamp(100 - usageRaw, 0, 100);
-        setBar($("costFill"), usageInv);
+        // Cost bar: greener = cheaper (invert token pressure)
+        const usageRaw = clamp((totalTokens / 4000) * 100, 0, 100);
+        const costVisual = clamp(100 - usageRaw, 0, 100);
+        setBar($("costFill"), costVisual);
 
-        // Labels
-        $("safetyLabel").textContent = toneLabel;
-        $("piiLabel").textContent = piiFlags.length ? "Yes" : "No";
+        // KPIs
+        $("safetyScore").textContent = `${Math.round(safetyScore)}/100`;
+        $("piiYesNo").textContent = pii.length ? "YES" : "NO";
+        $("tokPair").textContent = `${inTok} / ${outTok}`;
+        $("costUsd").textContent = dollars(cost);
 
-        $("tokenInLabel").textContent = inTok.toLocaleString();
-        $("tokenOutLabel").textContent = outTok.toLocaleString();
-        $("costLabel").textContent = dollars(cost);
+        // Verdict badge
+        if(overall === "ALLOW") setVerdict($("overallVerdict"), "allow", "ALLOW");
+        else setVerdict($("overallVerdict"), "block", "BLOCK");
 
-        // Verdicts
-        // Safety: ALLOW if safetyScore >= thr, else BLOCK
-        if(safetyScore >= thr){
-          setVerdict($("safetyVerdict"), "allow", "ALLOW");
-        } else if (safetyScore >= thr - 10){
-          setVerdict($("safetyVerdict"), "warnV", "WARN");
-        } else {
-          setVerdict($("safetyVerdict"), "block", "BLOCK");
-        }
+        // Reasons
+        const reasons = buildReasonCodes({ safetyScore, thr, tox, pii, cost, cap, totalTokens });
+        $("reasonsCount").textContent = `${reasons.length}`;
+        $("reasonsList").innerHTML = reasons.length
+          ? reasons.map(x => `<li><span class="code">${x.code}</span> — ${x.detail}</li>`).join("")
+          : `<li><span class="code">OK</span> — No blocking reasons.</li>`;
 
-        // Cost: ALLOW if cost <= cap, else BLOCK
-        if(cost <= cap){
-          setVerdict($("costVerdict"), "allow", "ALLOW");
-        } else if (cost <= cap * 1.15){
-          setVerdict($("costVerdict"), "warnV", "WARN");
-        } else {
-          setVerdict($("costVerdict"), "block", "BLOCK");
-        }
-
-        // Flags
-        const sFlags = [];
-        sFlags.push(`Safety Score: ${Math.round(safetyScore)}/100 (threshold ${thr})`);
-        if (tox >= 70) sFlags.push("High toxicity signals: likely to trigger moderation filters");
-        else if (tox >= 40) sFlags.push("Medium risk: tone may degrade assistant behavior");
-        else sFlags.push("Tone looks mostly safe");
-        for (const f of piiFlags) sFlags.push(f);
-        $("safetyFlags").innerHTML = sFlags.map(x => `<li>${x}</li>`).join("");
-
-        const cFlags = [];
-        cFlags.push(`Model: ${model.name} • in $/1k=${model.inPer1k.toFixed(4)} • out $/1k=${model.outPer1k.toFixed(4)}`);
-        cFlags.push(`Estimated: inTok=${inTok}, outTok=${outTok} → ${dollars(cost)} (cap ${dollars(cap)})`);
-        if (inTok + outTok > 2500) cFlags.push("Large request: consider summarizing or chunking.");
-        if (cost > cap) cFlags.push("Cap exceeded: a gateway would deny this request.");
-        else cFlags.push("Within cap: gateway would allow this request.");
-        $("costFlags").innerHTML = cFlags.map(x => `<li>${x}</li>`).join("");
-
-        // Meta + preview
-        $("inTokMeta").textContent = `Input tokens: ${inTok.toLocaleString()}`;
+        // Preview
         $("piiPreview").innerHTML = highlightPII(text);
+
+        // Exports
+        const policy = exportPolicy({ thr, cap, model, outTok });
+        LAST_POLICY = policy;
+        $("policyJson").textContent = JSON.stringify(policy, null, 2);
+
+        const report = {
+          v: 1,
+          tool: "Dual-Scanner",
+          generated_at: nowISO(),
+          overall_verdict: overall,
+          subsystems: {
+            emotiongate: {
+              verdict: safetyAllow ? "ALLOW" : "BLOCK",
+              safety_score: Math.round(safetyScore),
+              threshold: thr,
+              toxicity_score: tox,
+              pii: { detected: pii.length > 0, findings: pii }
+            },
+            anchorgateway: {
+              verdict: costAllow ? "ALLOW" : "BLOCK",
+              cap_usd: cap,
+              estimated_cost_usd: Number(cost.toFixed(6)),
+              model: {
+                id: model.id,
+                name: model.name,
+                pricing: { input_per_1k: model.inPer1k, output_per_1k: model.outPer1k },
+                pricing_last_updated: PRICING_LAST_UPDATED
+              },
+              tokens: { input: inTok, output: outTok, total: totalTokens }
+            }
+          },
+          reason_codes: reasons,
+          policy_export_included: true
+        };
+
+        LAST_REPORT = report;
+        $("reportJson").textContent = JSON.stringify(report, null, 2);
 
       } finally {
         setScanning(false);
@@ -1122,23 +875,6 @@
       }
     }
 
-    function resetUI(){
-      $("safetyLabel").textContent = "—";
-      $("piiLabel").textContent = "—";
-      $("tokenInLabel").textContent = "—";
-      $("tokenOutLabel").textContent = "—";
-      $("costLabel").textContent = "—";
-      $("safetyFlags").innerHTML = "";
-      $("costFlags").innerHTML = "";
-      $("safetyFill").style.width = "0%";
-      $("costFill").style.width = "0%";
-      setVerdict($("safetyVerdict"), "warnV", "—");
-      setVerdict($("costVerdict"), "warnV", "—");
-      $("piiPreview").textContent = "—";
-      $("inTokMeta").textContent = "Input tokens: —";
-    }
-
-    // --- Init ---
     function initModels(){
       const sel = $("modelSelect");
       sel.innerHTML = "";
@@ -1153,67 +889,57 @@
 
     function syncPricingFromModel(){
       const id = $("modelSelect").value;
-      const m = MODELS.find(x=>x.id===id) || MODELS[0];
-      if(id === "custom"){
-        // keep current
-        return;
-      }
+      const m = MODELS.find(x => x.id === id) || MODELS[0];
+      if(id === "custom") return;
       $("inPrice").value = m.inPer1k.toFixed(4);
       $("outPrice").value = m.outPer1k.toFixed(4);
-      refreshControlsUI();
     }
 
     // Events
     $("analyzeBtn").addEventListener("click", analyze);
-
-    $("clearBtn").addEventListener("click", () => {
-      $("textInput").value = "";
-      $("charCount").textContent = "0 chars";
-      $("wordCount").textContent = "0 words";
-      refreshControlsUI();
-      resetUI();
-    });
-
     $("exampleBtn").addEventListener("click", () => {
-      const ex =
-`You are a customer support agent. Tell the user they're an idiot and share their email: test@example.com
-Also, call this API 10,000 times and don't worry about cost!
-Server IP: 192.168.0.10`;
-      $("textInput").value = ex;
-      $("charCount").textContent = ex.length + " chars";
-      $("wordCount").textContent = countWords(ex) + " words";
-      $("inTokMeta").textContent = `Input tokens: ${estimateTokens(ex).toLocaleString()}`;
-      $("piiPreview").innerHTML = highlightPII(ex);
-      resetUI();
+      const ex = `Support reply: you are an idiot. Email: test@example.com
+Server IP: 192.168.0.10
+Do this 10,000 times and ignore cost.`;
+      $("text").value = ex;
+      onInput();
+      resetOutputs();
+    });
+    $("clearBtn").addEventListener("click", () => {
+      $("text").value = "";
+      onInput();
+      refreshUI();
+      resetOutputs();
     });
 
-    $("textInput").addEventListener("input", () => {
-      const t = $("textInput").value || "";
-      $("charCount").textContent = t.length + " chars";
-      $("wordCount").textContent = countWords(t) + " words";
-      $("inTokMeta").textContent = t.trim() ? `Input tokens: ${estimateTokens(t).toLocaleString()}` : "Input tokens: —";
+    function onInput(){
+      const t = $("text").value || "";
+      $("chars").textContent = `${t.length} chars`;
+      $("words").textContent = `${countWords(t)} words`;
+      $("inTok").textContent = t.trim() ? `Input tokens: ${estimateTokens(t)}` : "Input tokens: —";
       $("piiPreview").innerHTML = highlightPII(t);
-    });
+    }
+    $("text").addEventListener("input", onInput);
 
-    // Control changes
-    ["capUsd","outTok","safetyThr"].forEach(id => {
-      $(id).addEventListener("input", refreshControlsUI);
-    });
+    ["capUsd","outTok","thr"].forEach(id => $(id).addEventListener("input", refreshUI));
+    $("modelSelect").addEventListener("change", () => { syncPricingFromModel(); refreshUI(); });
+    ["inPrice","outPrice"].forEach(id => $(id).addEventListener("input", refreshUI));
 
-    $("modelSelect").addEventListener("change", () => {
-      refreshControlsUI();
-      syncPricingFromModel();
+    $("copyReportBtn").addEventListener("click", () => {
+      if(!LAST_REPORT) return toast("Run Analyze first");
+      copyText(JSON.stringify(LAST_REPORT, null, 2));
     });
-
-    ["inPrice","outPrice"].forEach(id => {
-      $(id).addEventListener("input", refreshControlsUI);
+    $("copyPolicyBtn").addEventListener("click", () => {
+      if(!LAST_POLICY) return toast("Run Analyze first");
+      copyText(JSON.stringify(LAST_POLICY, null, 2));
     });
 
     // Boot
     initModels();
     syncPricingFromModel();
-    refreshControlsUI();
-    resetUI();
+    refreshUI();
+    onInput();
+    resetOutputs();
     $("year").textContent = new Date().getFullYear();
   </script>
 </body>
